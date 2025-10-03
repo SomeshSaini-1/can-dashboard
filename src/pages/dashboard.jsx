@@ -186,7 +186,7 @@
 //   useEffect(()=>{
 //     selected && info_data(selected.device_id)
 //   },[selected])
-  
+
 
 //   return (
 //     <div className="flex">
@@ -380,7 +380,7 @@
 import React, { useState, createContext, useEffect, useCallback } from "react";
 import Navbar from "../components/Nav.jsx";
 import MapComponent from "../components/mapcomponent.jsx";
-import { BusFront, Gauge, MapPin, X } from "lucide-react";
+import { BusFront, Gauge, MapPin, Phone, PhoneCall, User, X } from "lucide-react";
 
 export const VehicleContext = createContext();
 
@@ -410,10 +410,11 @@ const vehicles = [
 const Dashboard = () => {
   const [selected, setSelected] = useState(null);
   const [telemetry, setTelemetry] = useState(null);
+  const [vehical, setvehical] = useState(null)
   const apiurl = import.meta.env.VITE_API_URL;
-  
 
-  const [Device_data,setDevice_data] = useState([]); 
+
+  const [Device_data, setDevice_data] = useState([]);
   async function fetchDevices() {
     const url = await fetch(`${apiurl}/get_device`, {
       method: "POST",
@@ -429,26 +430,28 @@ const Dashboard = () => {
 
 
   useEffect(() => {
-  fetchDevices();
-}, []);
+    fetchDevices();
+  }, []);
 
-  const vehical_data = useCallback(async (id) =>{
+  const vehical_data = useCallback(async (id) => {
     try {
-      const url = await fetch(`${apiurl}/get_driver`,{
-        method : "POST",
-        headers : { "Content-Type":"application/json"},
-        body : JSON.stringify({ driver_name: "all" }),
+      console.log(selected, selected.Assing_to)
+      const url = await fetch(`${apiurl}/get_driver`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ driver_name: id }),
       });
 
       const data = await url.json();
 
       console.log(data);
+      setvehical(data);
 
     } catch (error) {
-      console.error("db error : ",error);
-      
+      console.error("db error : ", error);
+
     }
-  },[]);
+  }, [selected]);
 
   // Fetch API Data
   const fetchDeviceData = useCallback(async (device_id) => {
@@ -475,7 +478,7 @@ const Dashboard = () => {
     if (!selected) return;
 
     fetchDeviceData(selected.device_id);
-
+    vehical_data(selected.Assing_to)
     const interval = setInterval(() => {
       fetchDeviceData(selected.device_id);
     }, 120000);
@@ -501,14 +504,12 @@ const Dashboard = () => {
               setSelected(v);
               setTelemetry(null);
             }}
-            className={`relative p-3 border mb-2 cursor-pointer rounded ${
-              selected?.device_id === v.device_id ? "bg-blue-100" : "hover:bg-gray-50"
-            }`}
+            className={`relative p-3 border mb-2 cursor-pointer rounded ${selected?.device_id === v.device_id ? "bg-blue-100" : "hover:bg-gray-50"
+              }`}
           >
             <div
-              className={`absolute top-0 left-0 h-full w-5 flex items-center justify-center rounded-l ${
-                v.status === "Disconnect" ? "bg-green-500" : "bg-red-500"
-              }`}
+              className={`absolute top-0 left-0 h-full w-5 flex items-center justify-center rounded-l ${v.status === "Disconnect" ? "bg-green-500" : "bg-red-500"
+                }`}
             >
               <span className="text-white text-[10px] font-bold -rotate-90">
                 {v.status || "Disconnect"}
@@ -518,13 +519,12 @@ const Dashboard = () => {
               <div className="flex justify-between items-center">
                 <span className="font-semibold">{v.device_id}</span>
                 <span
-                  className={`text-xs px-2 py-1 rounded ${
-                    v.device_mode === "Test"
+                  className={`text-xs px-2 py-1 rounded ${v.device_mode === "Test"
                       ? "bg-green-100 text-green-600"
                       : v.device_mode === "STOPPED"
-                      ? "bg-red-100 text-red-600"
-                      : "bg-yellow-100 text-yellow-600"
-                  }`}
+                        ? "bg-red-100 text-red-600"
+                        : "bg-yellow-100 text-yellow-600"
+                    }`}
                 >
                   {v.device_mode}
                 </span>
@@ -536,7 +536,7 @@ const Dashboard = () => {
         ))}
       </div>
 
-      {/* Map + Details */} 
+      {/* Map + Details */}
       <div className="flex-1 relative">
         <MapComponent />
 
@@ -552,20 +552,23 @@ const Dashboard = () => {
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold">{selected.device_id}</h2>
               <span className="px-3 py-1 bg-green-100 text-green-600 rounded">
-                {selected.device_mode}
+                {selected.device_mode || "Test"}
               </span>
             </div>
             <p className="text-sm text-gray-500 mb-2">
-              Status: {selected.status}
+              Status: {selected.status || "GOOD"}
             </p>
 
             <h3 className="text-lg text-gray-400 mb-2">VEHICLE DETAILS</h3>
             <div className="space-y-1 text-gray-700 text-sm">
               <p className="flex gap-2">
-                <MapPin /> {selected.address}
+                <User /> {vehical && vehical[0].driver_name}
               </p>
               <p className="flex gap-2 my-2">
-                <BusFront /> {selected.model}
+                <Phone /> {vehical && vehical[0]?.driver_num}
+              </p>
+              <p className="flex gap-2 my-2">
+                <BusFront /> {vehical && vehical[0]?.driver_vhical_num}
               </p>
               <p className="flex gap-2 ">
                 <Gauge /> {telemetry?.Total_VehicleDistance || "--"} km
@@ -575,7 +578,7 @@ const Dashboard = () => {
               </p>
             </div>
 
-            {/* Sensor Values */ console.log(telemetry ,'telemetry')}
+            {/* Sensor Values */ console.log(telemetry, 'telemetry')}
             {telemetry ? (
               <div className="mt-6">
                 <h3 className="text-lg font-semibold text-gray-600 mb-3">
@@ -595,11 +598,26 @@ const Dashboard = () => {
                   <SensorCard label="Odometer" value={`${telemetry.Total_VehicleDistance || "--"} km`} />
                   <SensorCard label="Exhaust Temp" value={`${telemetry.ExhaustGasTemp_C || "--"} °C`} />
                   <SensorCard label="Turbo Boost" value={`${telemetry.Engine_Turbocharger_Boost_Pressure || "--"} kPa`} />
-                  <SensorCard label="Battery Voltage" Value={`${telemetry.EngineCoolantTemp || "--"}`}/>
+                  <SensorCard label="Cruise Set Speed" value={`${telemetry.CruiseSetSpeed_kph || "--"} km/h`} />
+                  <SensorCard label="Intake Temp" value={`${telemetry.IntakeTemp || "--"} °C`} />
+                  <SensorCard label="Air Manifold Temp" value={`${telemetry.Engine_AirIntakeManifold1_Temperature || "--"} °C`} />
+                  <SensorCard label="Air Inlet Pressure" value={`${telemetry.Engine_AirInlet_Pressure || "--"} kPa`} />
+                  <SensorCard label="Net Battery Current" value={`${telemetry.Net_Battery_Current || "--"} A`} />
+                  <SensorCard label="Engine Oil Pressure" value={`${telemetry.EngineOilPressure_kPa || "--"} kPa`} />
+                  <SensorCard label="Crankcase Pressure" value={`${telemetry.Engine_Crankcase_Pressure || "--"} kPa`} />
+                  <SensorCard label="Pedal Position" value={`${telemetry.Pedal_Position || "--"} %`} />
+                  <SensorCard label="Engine Load (Alt)" value={`${telemetry.Engine_Load || "--"} %`} />
+                  <SensorCard label="Trip Fuel" value={`${telemetry.Engine_TripFuel || "--"} L`} />
+                  <SensorCard label="Total Fuel Used" value={`${telemetry.Engine_Total_FuelUsed || "--"} L`} />
+                  <SensorCard label="Total Hours" value={`${telemetry.Engine_TotalHours || "--"} h`} />
+                  <SensorCard label="Total Revolutions" value={`${telemetry.Engine_Total_Revolutions || "--"}`} />
+                  <SensorCard label="Turbo Inlet Temp" value={`${telemetry.TurboInletTemp_C || "--"} °C`} />
+                  <SensorCard label="Transmission Gear" value={`${telemetry.Transmission_Current_Gear || "--"}`} />
+
                 </div>
               </div>
             ) : (
-              <p className="text-center text-gray-400 mt-4">Loading data...</p>
+              <p className="text-center text-gray-400 mt-4">No Data</p>
             )}
           </div>
         )}
@@ -612,7 +630,7 @@ const Dashboard = () => {
 const SensorCard = ({ label, value }) => (
   <div className="bg-white shadow rounded p-3">
     <p className="text-sm text-gray-500">{label}</p>
-    <p className="text-lg font-bold">{value}</p>
+    <p className="text-lg font-bold">{value || "--"}</p>
   </div>
 );
 
