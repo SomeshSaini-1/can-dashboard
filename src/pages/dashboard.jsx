@@ -454,7 +454,7 @@ const Dashboard = () => {
   const fetchDeviceData = useCallback(async (device_id) => {
     if (!device_id) return;
     try {
-      const response = await fetch("http://localhost:4010/api/get_device_info", {
+      const response = await fetch(`${apiurl}/get_device_info`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ device_id }),
