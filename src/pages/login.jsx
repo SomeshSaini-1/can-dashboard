@@ -42,7 +42,7 @@ const Login = () => {
             className="h-16 mb-2"
           />
           <h2 className="text-xl font-semibold text-gray-700">
-            Welcome to Candashboard
+            Welcome to Oxymora
           </h2>
           <p className="text-sm text-gray-500">Log in</p>
         </div>
