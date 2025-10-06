@@ -10,7 +10,8 @@ import Adddevice from './pages/Device';
 import User from './pages/User';
 import Help from './pages/Help';
 import Setting from './pages/Setting';
-import Alert_page from './pages/Alert'
+import Alert_page from './pages/Alert';
+import History from "./pages/history";
 
 // Route protection component
 function ProtectedRoute() {
@@ -21,13 +22,13 @@ function ProtectedRoute() {
 function App() {
   const router = createBrowserRouter([
     {
-      element: <ProtectedRoute />, // Protect all children routes
-      children: [
-        {
+      // element: <ProtectedRoute />, // Protect all children routes
+      // children: [
+      //   {
           path: '/Home',
           element: <Home />,
-        },
-      ],
+      //   },
+      // ],
     },
     {
       // element: <ProtectedRoute />,
@@ -42,6 +43,10 @@ function App() {
       path:"/AddDevice",
       element : <Adddevice />
     },
+      {
+        path : "/History",
+        element : <History />
+      },
     {
       path :"/User",
       element : <User />
