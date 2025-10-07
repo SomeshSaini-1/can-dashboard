@@ -1,141 +1,252 @@
-import { CircleX, Delete, DeleteIcon, Edit, Filter, Plus, Search, Trash2 } from "lucide-react";
+
+// pages/Adddevice.jsx (Main Component)
+import { Edit } from "lucide-react";
 import Sidebar from "../components/Nav";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { debounce } from "lodash"; // Ensure lodash is installed: npm install lodash
 
 export default function Adddevice() {
-  
-  
-const apiurl = import.meta.env.VITE_API_URL;
+  const apiurl = import.meta.env.VITE_API_URL;
 
-  const [Device_data,setDevice_data] = useState([]);
+  const [deviceData, setDeviceData] = useState([]);
+  const [deviceId, setDeviceId] = useState("all");
+  const [sensorData, setSensorData] = useState([]);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [limit,setlimit] = useState(10);
+  const [collapsed, setCollapsed] = useState(false);
+
+
+  const keydata = {
+    Total_VehicleDistance: "TotVehDist",
+    EngineSpeed_rpm: "EngSpd",
+    WheelBasedSpeed_kph: "WhlSpd",
+    EngineCoolantTemp: "CoolantTemp",
+    BatteryVoltage_V: "BattVolt",
+    CruiseSetSpeed_kph: "CruiseSpd",
+    IntakeTemp: "IntkTemp",
+    Engine_Turbocharger_Boost_Pressure: "TurboBoost",
+    Engine_AirIntakeManifold1_Temperature: "ManifTemp",
+    Engine_AirInlet_Pressure: "AirInPres",
+    Net_Battery_Current: "BattCurr",
+    Battery_Potential_s: "BattPot",
+    FuelLevel_Percent: "FuelLvl",
+    EngineOilPressure_kPa: "OilPres",
+    Engine_Crankcase_Pressure: "CrnkPres",
+    Engine_Throttle_Position: "ThrottlePos",
+    Engine_Fuel_Rate: "FuelRate",
+    Pedal_Position: "PedalPos",
+    Engine_Load: "EngLoad",
+    Engine_TripFuel: "TripFuel",
+    Engine_Total_FuelUsed: "TotFuel",
+    Engine_TotalHours: "EngHrs",
+    Engine_Total_Revolutions: "EngRev",
+    ExhaustGasTemp_C: "ExhGasTemp",
+    TurboInletTemp_C: "TurboInTemp",
+    Transmission_Current_Gear: "CurrGear",
+    Catalyst_Level: "CatLvl",
+    createdAt: "Datetime",
+  };
+
   async function fetchDevices() {
-    const url = await fetch(`${apiurl}/get_device`, {
-      method: "POST",
-      body: JSON.stringify({ device_id: "all" }),
-      headers: { "Content-Type": "application/json" }
-    });
-    const res = await url.json();
-    console.log(res);
-    setDevice_data(res);
+    setIsLoading(true);
 
-
-  }
-
-
-  useEffect(() => {
-  fetchDevices();
-}, []);
-
-
-
-  async function fetchDrivers() {
-    const url = await fetch(`${apiurl}/all_data`, {
-      method: "POST",
-      body: JSON.stringify({ 
-        device_id : sensorValue || "08F9E03D1D08",
-        limit: 300,
-        page: 1
-      }),
-      headers: { "Content-Type": "application/json" }
-    });
-    const res = await url.json();
-    console.log(Driver_data);
-  }
-
-  useEffect(() => {
-    fetchDrivers();
-  }, [sensorValue]);
-
-
-
-const [Search,setSearch] = useState();
-
-
-  const delete_ele = async (id) =>{
     try {
-      console.log(id);
-      let confirm_ = confirm("you are shur to delete the data.")
-
-      if(confirm_ === false) return;
-      
-      const url = await fetch(`${apiurl}/delete_device`,{
-        method : "POST",
-        headers : {"Content-Type":"application/json"},
-        body : JSON.stringify({device_id : id})
+      const response = await fetch(`${apiurl}/get_device`, {
+        method: "POST",
+        body: JSON.stringify({ device_id: "all" }),
+        headers: { "Content-Type": "application/json" },
       });
-
-      const res = await url.json();
-      console.log(res);
-      fetchDevices();
-
+      if (!response.ok) throw new Error("Failed to fetch devices");
+      const res = await response.json();
+      console.log(res ,'device data.');
+      setDeviceData(res);
     } catch (error) {
-      console.error("error : ",error);
-      
+      setError("Error fetching devices");
+      console.error("Error fetching devices:", error);
+    } finally {
+      setIsLoading(false);
     }
   }
 
+  async function all_data() {
+    setIsLoading(true);
+    console.log("all data ...");
+    try {
+      const response = await fetch(`${apiurl}/all_data`, {
+        method: "POST",
+        body: JSON.stringify({
+          device_id: deviceId,
+          limit: limit,
+          page: page,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) throw new Error("Failed to fetch sensor data");
+      const res = await response.json();
+      console.log(res ,'device data.');
+      setSensorData(res.data || []);
+    } catch (error) {
+      setError("Error fetching sensor data");
+      console.error("Error fetching sensor data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const exportData = () => {
+    const headers = Object.keys(keydata).filter((key) => sensorData[0]?.[key]);
+    const csvContent = [
+      ["Device ID", ...headers.map((key) => keydata[key])].join(","),
+      ...sensorData.map((row) =>
+        [row.device_id, ...headers.map((key) => row[key] ?? "N/A")].join(",")
+      ),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sensor_data.csv";
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
+  // Debounce search input
+  const debouncedSetSearch = useCallback(
+    debounce((value) => setSearch(value), 300),
+    []
+  );
+
+  useEffect(() => {
+    fetchDevices();
+  }, []);
+
+  useEffect(() => {
+    all_data();
+  }, [deviceId, page,limit]);
+
 
   return (
-    <div className="flex">
+    <div className="flex min-h-screen">
       <Sidebar />
-
-    
-
-      <div className="flex-1 p-6">
-        <div className="mb-8 font-semibold flex items-center justify-between">
+      <div className={`flex-1 p-6 bg-gray-50 
+        ${collapsed ? "w-20" : "w-64"}
+        `} 
+      onMouseEnter={() => setCollapsed(false)}
+      onMouseLeave={() => setCollapsed(true)}
+      >
+        <div className="mb-8 font-semibold text-2xl flex items-center justify-between">
           Device History
         </div>
 
-        <div className="overflow-auto">
-          <div className="flex items-center justify-between">
-            <span className="flex gap-2 m-2 items-center">
-              <ul>
-                <li>98768769987987</li>
-                <li>Track and manage all devices in real time</li>
-              </ul>
-              <input
-                type="text"
-                placeholder="Search ..."
-                className="border-2 border-gray-200 p-2 rounded"
-                onChange={e => setSearch(e.target.value)}
-                value={Search || ""}
-              />
-            </span>
-            <button className="border-2 border-blue-400 rounded px-2 py-1 ">Export Data</button>
+        {isLoading && <p className="text-blue-500">Loading...</p>}
+        {error && <p className="text-red-500">{error}</p>}
+
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex gap-4 items-center">
+            <select value={limit}
+              onChange={(e) => setlimit(e.target.value)}
+              className="border-2 border-gray-200 p-2 rounded">
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="30">30</option>
+            </select>
+            <select
+              value={deviceId}
+              onChange={(e) => setDeviceId(e.target.value)}
+              className="border-2 border-gray-200 p-2 rounded"
+            >
+              <option value="all">All Devices</option>
+              {deviceData.map((device) => (
+                <option key={device.device_id} value={device.device_id}>
+                  {device.device_id}
+                </option>
+              ))}
+            </select>
+            {/* <input
+              type="text"
+              placeholder="Search by Device ID..."
+              className="border-2 border-gray-200 p-2 rounded"
+              onChange={(e) => debouncedSetSearch(e.target.value)}
+            /> */}
           </div>
-          <table className="min-w-full text-sm text-center border rounded">
+          <button
+            onClick={exportData}
+            className="border-2 border-blue-400 rounded px-4 py-2 text-blue-600 hover:bg-blue-100"
+          >
+            Export Data
+          </button>
+        </div>
+
+        <div className="overflow-auto ">
+          <table className="w-full text-sm text-center border rounded bg-white">
             <thead>
-              <tr>
-                <th className="border px-3 py-2">Sr.</th>
-                <th className="border px-3 py-2">Device Name</th>
-                <th className="border px-3 py-2">Device Id</th>
-                <th className="border px-3 py-2">Device Mode</th>
-                <th className="border px-3 py-2">Date</th>
-                <th className="border px-3 py-2">Assing To</th>
-                <th className="border px-3 py-2">Action</th>
+              <tr className="bg-gray-200">
+                <th scope="col" className="border px-3 py-2">
+                  Sr.
+                </th>
+                <th scope="col" className="border px-3 py-2">
+                  Device Id
+                </th>
+                {sensorData[0] &&
+                  Object.keys(sensorData[0])
+                    .filter((key) => keydata[key])
+                    .map((key, index) => (
+                      <th scope="col" className="border px-3 py-2" key={index}>
+                        {keydata[key]}
+                      </th>
+                    ))}
+                <th scope="col" className="border px-3 py-2">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody>
-              {Device_data?.filter(el =>
-                !Search ||
-                el.device_id?.toLowerCase().includes(Search?.toLowerCase()) ||
-                el.device_name?.toLowerCase().includes(Search?.toLowerCase())
-              ).map((ele, index) => (
-                <tr key={index}>
-                  <td>{index + 1}.</td>
-                  <td>{ele.device_name}</td>
-                  <td>{ele.device_id}</td>
-                  <td>{ele.device_mode}</td>
-                  <td>{ele.date}</td>
-                  <td>{ele.Assing_to}</td>
-                  <td className="flex items-center justify-center gap-2">
-                    <Edit className="text-green-400 m-1" />
-                    <Trash2 className="text-red-400 m-1" onClick={() => delete_ele(ele.device_id)}/>
-                  </td>
-                </tr>
-              ))}
+              {sensorData
+                .filter(
+                  (el) =>
+                    !search ||
+                    el.device_id?.toLowerCase().includes(search.toLowerCase())
+                )
+                .map((ele, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td className="border px-3 py-2">{index + 1}.</td>
+                    <td className="border px-3 py-2">{ele.device_id}</td>
+                    {sensorData[0] &&
+                      Object.keys(sensorData[0])
+                        .filter((key) => keydata[key])
+                        .map((key, idx) => (
+                          <td className="border px-3 py-2" key={idx}>
+                            {ele[key] ?? "N/A"}
+                          </td>
+                        ))}
+                    <td className="flex items-center justify-center gap-2 border px-3 py-2">
+                      <Edit className="text-green-400 cursor-pointer" />
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
+        </div>
+
+        <div className="flex items-center justify-center gap-4 mt-4">
+          <button
+            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+            disabled={page === 1}
+            className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+          >
+            Previous
+          </button>
+          {page}
+          <button
+            onClick={() => setPage((prev) => prev + 1)}
+            className="px-4 py-2 bg-blue-500 text-white rounded"
+          >
+            Next
+          </button>
         </div>
       </div>
     </div>

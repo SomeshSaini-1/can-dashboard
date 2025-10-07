@@ -108,6 +108,7 @@ const Home = () => {
               <span className='flex gap-2 border flex items-center rounded p-2'>
                 {/* <SlidersHorizontal className='h-5' /> */}
                 <select name="data" id="data" onChange={(e) => setsensor1(e.target.value)}>
+                    <option value={""}>Select the option</option>
                   {sensor.map((ele,index) => (
                     <option key={index} value={ele}>{ele}</option>
                   ))}

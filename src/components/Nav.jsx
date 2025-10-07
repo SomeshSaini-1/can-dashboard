@@ -7,7 +7,8 @@ import {
   Settings,
   HelpCircle,
   LogOut,
-  TriangleAlert
+  TriangleAlert,
+  ClipboardClock
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -27,6 +28,7 @@ export default function Sidebar() {
   const deploy = [
     { name: "Map", icon: <Map size={20} />, link:"/Dashboard" },
     { name: "Alart", icon: <TriangleAlert size={20} />, link:"/Alert" },
+    { name: "History", icon: <ClipboardClock size={20} />, link:"/History" }
   ];
 
   const others = [

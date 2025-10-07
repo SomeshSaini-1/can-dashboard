@@ -7,11 +7,11 @@ import store from './redux/store.js'
 import Variable from "./assets/variable.jsx"
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <Provider store={store}>
       <Variable >
         <App />
       </Variable>
     </Provider>
-  </StrictMode>,
+  // </StrictMode>,
 )
