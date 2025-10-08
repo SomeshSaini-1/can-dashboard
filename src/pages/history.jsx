@@ -3,7 +3,7 @@
 import { Edit } from "lucide-react";
 import Sidebar from "../components/Nav";
 import { useEffect, useState, useCallback } from "react";
-import { debounce } from "lodash"; // Ensure lodash is installed: npm install lodash
+// import { debounce } from "lodash"; // Ensure lodash is installed: npm install lodash
 
 export default function Adddevice() {
   const apiurl = import.meta.env.VITE_API_URL;
@@ -114,11 +114,11 @@ export default function Adddevice() {
     window.URL.revokeObjectURL(url);
   };
 
-  // Debounce search input
-  const debouncedSetSearch = useCallback(
-    debounce((value) => setSearch(value), 300),
-    []
-  );
+  // // Debounce search input
+  // const debouncedSetSearch = useCallback(
+  //   debounce((value) => setSearch(value), 300),
+  //   []
+  // );
 
   useEffect(() => {
     fetchDevices();
