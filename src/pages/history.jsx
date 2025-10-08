@@ -84,7 +84,7 @@ export default function Adddevice() {
         }),
         headers: { "Content-Type": "application/json" },
       });
-      if (!response.ok) throw new Error("Failed to fetch sensor data");
+      if (!response.ok) throw new Error("Failed to fetch sensor data. ");
       const res = await response.json();
       console.log(res ,'device data.');
       setSensorData(res.data || []);
