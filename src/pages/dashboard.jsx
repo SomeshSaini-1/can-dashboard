@@ -508,7 +508,7 @@ const Dashboard = () => {
               }`}
           >
             <div
-              className={`absolute top-0 left-0 h-full w-5 flex items-center justify-center rounded-l ${v.status === "Disconnect" ? "bg-green-500" : "bg-red-500"
+              className={`absolute top-0 left-0 h-full w-5 flex items-center justify-center rounded-l ${v.status === "Connected" ? "bg-green-500" : "bg-red-500"
                 }`}
             >
               <span className="text-white text-[10px] font-bold -rotate-90">
