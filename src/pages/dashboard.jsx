@@ -486,7 +486,7 @@ const Dashboard = () => {
     const interval = setInterval(() => {
 
       fetchDeviceData(selected.device_id);
-    }, 1000);
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [selected, fetchDeviceData]);
@@ -656,6 +656,7 @@ function SpeedBox({ device_id }) {
       });
 
       const data = await response.json();
+      console.log("speed_data")
       if (Array.isArray(data) && data.length > 0) {
         return data[0].WheelBasedSpeed_kph;
       }
@@ -670,6 +671,9 @@ function SpeedBox({ device_id }) {
     (async () => {
       const result = await speed_data(device_id);
       if (result) setSpeed(Number(result));
+       const interval = setInterval(() => {
+      speed_data(device_id);
+    }, 1000);
     })();
   }, [device_id, speed_data]);
 
