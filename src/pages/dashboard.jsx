@@ -455,6 +455,7 @@ const Dashboard = () => {
 
   // Fetch API Data
   const fetchDeviceData = useCallback(async (device_id) => {
+    console.log("data")
     if (!device_id) return;
     try {
       const response = await fetch(`${apiurl}/get_device_info`, {
@@ -473,6 +474,9 @@ const Dashboard = () => {
     }
   }, []);
 
+
+
+
   // Poll every 2 minutes
   useEffect(() => {
     if (!selected) return;
@@ -480,8 +484,9 @@ const Dashboard = () => {
     fetchDeviceData(selected.device_id);
     vehical_data(selected.Assing_to)
     const interval = setInterval(() => {
+
       fetchDeviceData(selected.device_id);
-    }, 120000);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [selected, fetchDeviceData]);
@@ -491,7 +496,7 @@ const Dashboard = () => {
       <Navbar />
 
       {/* Sidebar */}
-      <div className="w-1/4 h-screen border-r bg-white shadow p-2">
+      <div className="w-1/4 h-screen border-r bg-white shadow p-2 overflow-auto">
         <input
           type="text"
           placeholder="Search Vehicle..."
@@ -517,20 +522,17 @@ const Dashboard = () => {
             </div>
             <div className="pl-6">
               <div className="flex justify-between items-center">
-                <span className="font-semibold">{v.device_id}</span>
-                <span
-                  className={`text-xs px-2 py-1 rounded ${v.device_mode === "Test"
-                      ? "bg-green-100 text-green-600"
-                      : v.device_mode === "STOPPED"
-                        ? "bg-red-100 text-red-600"
-                        : "bg-yellow-100 text-yellow-600"
-                    }`}
-                >
-                  {v.device_mode}
+                <span className="font-semibold">
+                  {v.device_id}
+
+                  <div className="text-sm text-gray-600 truncate">{v.device_name}</div>
+                  <div className="text-xs text-gray-400">{v.date}</div>
                 </span>
+
+                <SpeedBox device_id={v.device_id} />
+
+
               </div>
-              <div className="text-sm text-gray-600 truncate">{v.device_name}</div>
-              <div className="text-xs text-gray-400">{v.date}</div>
             </div>
           </div>
         ))}
@@ -593,8 +595,8 @@ const Dashboard = () => {
                   <SensorCard label="Fuel Rate" value={`${telemetry.Engine_Fuel_Rate || "--"} L/h`} />
                   <SensorCard label="Fuel Level" value={`${telemetry.FuelLevel_Percent || "--"} %`} />
                   <SensorCard label="Adblue" value={`${telemetry.Catalyst_Level || "--"} %`} />
-                  <SensorCard label="Battery Voltage" value={`${telemetry.Battery_Potential_s || "--"} V`} />
-                  {/* <SensorCard label="Battery Potential" value={`${telemetry.Battery_Potential_s || "--"} V`} /> */}
+                  <SensorCard label="Battery Voltage" value={`${telemetry.BatteryVoltage_V || "--"} V`} />
+                  <SensorCard label="Battery Potential" value={`${telemetry.Battery_Potential_s || "--"} V`} />
                   {/* <SensorCard label="Odometer" value={`${telemetry.Total_VehicleDistance || "--"} km`} /> */}
                   <SensorCard label="Exhaust Temp" value={`${telemetry.ExhaustGasTemp_C || "--"} °C`} />
                   <SensorCard label="Turbo Boost" value={`${telemetry.Engine_Turbocharger_Boost_Pressure || "--"} kPa`} />
@@ -635,3 +637,58 @@ const SensorCard = ({ label, value }) => (
 );
 
 export default Dashboard;
+
+
+
+
+function SpeedBox({ device_id }) {
+  const [speed, setSpeed] = useState(0);
+
+  const apiurl = import.meta.env.VITE_API_URL;
+  // ✅ Function to fetch speed data
+  const speed_data = useCallback(async (device_id) => {
+    if (!device_id) return;
+    try {
+      const response = await fetch(`${apiurl}/get_device_info`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ device_id }),
+      });
+
+      const data = await response.json();
+      if (Array.isArray(data) && data.length > 0) {
+        return data[0].WheelBasedSpeed_kph;
+      }
+    } catch (error) {
+      console.error("Error fetching device info:", error);
+    }
+    return 0;
+  }, [apiurl]);
+
+  // ✅ Load speed when device_id changes
+  useEffect(() => {
+    (async () => {
+      const result = await speed_data(device_id);
+      if (result) setSpeed(Number(result));
+    })();
+  }, [device_id, speed_data]);
+
+  return (
+    <div className="w-[10rem] h-[5rem] flex flex-col items-center justify-center bg-gray-200 py-4 shadow-md rounded-2xl">
+      <span
+        className={`px-2 text-sm font-semibold border rounded-full mb-2 ${
+          speed > 0
+            ? "text-teal-600 border-teal-600 bg-teal-50"
+            : "text-red-600 border-red-600 bg-red-50"
+        }`}
+      >
+        {speed > 0 ? "MOVING" : "STOP"}
+      </span>
+      <div className="text-xl font-semibold text-gray-700">
+        {speed} <span className="text-sm font-normal text-gray-500">km/h</span>
+      </div>
+    </div>
+  );
+}
+
+
