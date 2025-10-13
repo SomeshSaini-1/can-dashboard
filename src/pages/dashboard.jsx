@@ -593,16 +593,16 @@ const Dashboard = () => {
                   <SensorCard label="Fuel Rate" value={`${telemetry.Engine_Fuel_Rate || "--"} L/h`} />
                   <SensorCard label="Fuel Level" value={`${telemetry.FuelLevel_Percent || "--"} %`} />
                   <SensorCard label="Adblue" value={`${telemetry.Catalyst_Level || "--"} %`} />
-                  <SensorCard label="Battery Voltage" value={`${telemetry.BatteryVoltage_V || "--"} V`} />
-                  <SensorCard label="Battery Potential" value={`${telemetry.Battery_Potential_s || "--"} V`} />
-                  <SensorCard label="Odometer" value={`${telemetry.Total_VehicleDistance || "--"} km`} />
+                  <SensorCard label="Battery Voltage" value={`${telemetry.Battery_Potential_s || "--"} V`} />
+                  {/* <SensorCard label="Battery Potential" value={`${telemetry.Battery_Potential_s || "--"} V`} /> */}
+                  {/* <SensorCard label="Odometer" value={`${telemetry.Total_VehicleDistance || "--"} km`} /> */}
                   <SensorCard label="Exhaust Temp" value={`${telemetry.ExhaustGasTemp_C || "--"} °C`} />
                   <SensorCard label="Turbo Boost" value={`${telemetry.Engine_Turbocharger_Boost_Pressure || "--"} kPa`} />
                   <SensorCard label="Cruise Set Speed" value={`${telemetry.CruiseSetSpeed_kph || "--"} km/h`} />
                   <SensorCard label="Intake Temp" value={`${telemetry.IntakeTemp || "--"} °C`} />
                   <SensorCard label="Air Manifold Temp" value={`${telemetry.Engine_AirIntakeManifold1_Temperature || "--"} °C`} />
                   <SensorCard label="Air Inlet Pressure" value={`${telemetry.Engine_AirInlet_Pressure || "--"} kPa`} />
-                  <SensorCard label="Net Battery Current" value={`${telemetry.Net_Battery_Current || "--"} A`} />
+                  {/* <SensorCard label="Net Battery Current" value={`${telemetry.Net_Battery_Current || "--"} A`} /> */}
                   <SensorCard label="Engine Oil Pressure" value={`${telemetry.EngineOilPressure_kPa || "--"} kPa`} />
                   <SensorCard label="Crankcase Pressure" value={`${telemetry.Engine_Crankcase_Pressure || "--"} kPa`} />
                   <SensorCard label="Pedal Position" value={`${telemetry.Pedal_Position || "--"} %`} />

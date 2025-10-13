@@ -6,24 +6,7 @@ import { useEffect, useState } from 'react'
 
 const Home = () => {
   const navigate = useNavigate();
-  const [data, setdata] = useState([
-    {
-      label: "TOTAL DISTANCE",
-      value: "200KM"
-    },
-    {
-      label: "TOTAL FUEL FILLING",
-      value: "200KM"
-    },
-    {
-      label: "TOTAL FUEL CONSUMPTION",
-      value: "200KM"
-    },
-    {
-      label: "TOTAL ENGINE HOURS",
-      value: "200KM"
-    }
-  ]);
+ 
 
 
 
@@ -79,6 +62,30 @@ const Home = () => {
 
   const [sensor1, setsensor1] = useState("");
   const [showChart, setShowChart] = useState(true); // toggle state
+  const [id,setid] = useState("");
+
+  useEffect(()=>{
+    
+   const [data, setdata] = useState([
+    {
+      label: "TOTAL DEVICES",
+      value: Device_data.length
+    },
+    {
+      label: "TOTAL FUEL FILLING",
+      value: "200KM"
+    },
+    {
+      label: "TOTAL FUEL CONSUMPTION",
+      value: "200KM"
+    },
+    {
+      label: "TOTAL ENGINE HOURS",
+      value: "200KM"
+    }
+  ]);
+  
+  },[Device_data])
 
   return (
     <div className='flex'>
@@ -107,6 +114,12 @@ const Home = () => {
               Chart
               <span className='flex gap-2 border flex items-center rounded p-2'>
                 {/* <SlidersHorizontal className='h-5' /> */}
+                <select name="data" id="data" onChange={(e) => setid(e.target.value)}>
+                    <option value={""}>Select the option</option>
+                  {Device_data.map((ele,index) => (
+                    <option key={index} value={ele.device_id}>{ele.device_name}</option>
+                  ))}
+                </select>
                 <select name="data" id="data" onChange={(e) => setsensor1(e.target.value)}>
                     <option value={""}>Select the option</option>
                   {sensor.map((ele,index) => (
@@ -120,7 +133,7 @@ const Home = () => {
               </span>
             </div>
             {/* Pass the value as a prop to the child */}
-            <Chart sensorValue={sensor1} showChart={showChart}/>
+            <Chart sensorValue={sensor1} showChart={showChart} deviceid={id}/>
           </div>
 
           <div className='flex-1 overflow-auto'>

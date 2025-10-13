@@ -6,11 +6,11 @@ const colors = [
   '#775DD0', '#3F51B5', '#546E7A', '#D4526E'
 ];
 
-const Chart = ({ sensorValue = "EngineSpeed_rpm", height = 350, showChart = true }) => {
+const Chart = ({ sensorValue = "EngineSpeed_rpm", height = 350, showChart = true, deviceid }) => {
   const apiurl = import.meta.env.VITE_API_URL;
   const [Driver_data, setDriver_data] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  console.log(deviceid)
   // ✅ Fetch function
   const fetchDrivers = async () => {
     try {
@@ -19,6 +19,7 @@ const Chart = ({ sensorValue = "EngineSpeed_rpm", height = 350, showChart = true
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          device_id: deviceid,
           sensorKey: sensorValue,
           limit: 100,
           page: 1
