@@ -64,9 +64,10 @@ const Home = () => {
   const [showChart, setShowChart] = useState(true); // toggle state
   const [id,setid] = useState("");
 
+  const [data, setdata] = useState([]);
+
   useEffect(()=>{
-    
-   const [data, setdata] = useState([
+    setdata([
     {
       label: "TOTAL DEVICES",
       value: Device_data.length
