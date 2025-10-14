@@ -648,7 +648,7 @@ const Dashboard = () => {
                   {/* <SensorCard label="Fuel Level" value={`${telemetry.FuelLevel_Percent || "--"} %`} /> */}
                   {/* <SensorCard label="Adblue" value={`${telemetry.Catalyst_Level || "--"} %`} /> */}
                   <SensorCard label="Battery Voltage" value={`${telemetry.BatteryVoltage_V || "--"} V`} />
-                  <SensorCard label="Battery Potential" value={`${telemetry.Battery_Potential_s || "--"} V`} />
+                  {/* <SensorCard label="Battery Potential" value={`${telemetry.Battery_Potential_s || "--"} V`} /> */}
                   {/* <SensorCard label="Odometer" value={`${telemetry.Total_VehicleDistance || "--"} km`} /> */}
                   <SensorCard label="Exhaust Ges Temp" value={`${telemetry.ExhaustGasTemp_C || "--"} °C`} />
                   <SensorCard label="Turbo Boost" value={`${telemetry.Engine_Turbocharger_Boost_Pressure || "--"} kPa`} />
