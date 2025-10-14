@@ -16,7 +16,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 const Map = ({ height = 500 }) => {
-  const defaultCenter = [26.852770, 75.779541];
+  const defaultCenter = [26.327573174041746, 94.42290457351207];
 
   const positions = [
     [26.852770, 75.779541],
@@ -27,7 +27,7 @@ const Map = ({ height = 500 }) => {
     <div style={{ borderRadius: '0.75rem', overflow: 'hidden', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
       <MapContainer
         center={defaultCenter}
-        zoom={13}
+        zoom={5}
         style={{ 
           height: `100vh`,
            width: '100%'

@@ -491,6 +491,7 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, [selected, fetchDeviceData]);
 
+  const [search,setsearch] = useState('');
   return (
     <div className="flex">
       <Navbar />
@@ -501,8 +502,16 @@ const Dashboard = () => {
           type="text"
           placeholder="Search Vehicle..."
           className="w-full rounded border px-2 py-1 mb-2"
+          onChange={(e) => {setsearch(e.target.value)}}
         />
-        {Device_data.map((v) => (
+        {
+        Device_data.filter(el => {
+        return (
+          !search ||
+          el.device_id?.toLowerCase().includes(search.toLowerCase()) ||
+          el.device_name?.toLowerCase().includes(search.toLowerCase())
+        );
+      }).map((v) => (
           <div
             key={v._id}
             onClick={() => {
@@ -586,6 +595,48 @@ const Dashboard = () => {
                 <h3 className="text-lg font-semibold text-gray-600 mb-3">
                   Sensor Values
                 </h3>
+                
+            {/* Fuel */}
+            <div className="mt-4 shadow rounded px-3 py-6">
+              <p className="font-semibold">Fuel</p>
+              <div className="w-full bg-green-200 rounded h-2 mt-1">
+                <div
+                  className="h-2 rounded bg-green-500"
+                  style={{ width: `${telemetry.FuelLevel_Percent}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                {telemetry.FuelLevel_Percent}% . 236 L . Capacity 400 L
+              </p>
+            </div>
+
+            {/* Soot */}
+            {/* <div className="mt-4 shadow rounded px-3 py-6">
+              <p className="font-semibold">Current Soot Load</p>
+              <div className="w-full bg-blue-200 rounded h-2 mt-1">
+                <div
+                  className="h-2 rounded bg-blue-500"
+                  style={{ width: `${selected.details.sootLoad}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                {selected.details.sootLoad}% (Threshold 100%)
+              </p>
+            </div> */}
+
+            {/* Adblue */}
+            <div className="mt-4 shadow rounded px-3 py-6">
+              <p className="font-semibold">Adblue</p>
+              <div className="w-full bg-yellow-200 rounded h-2 mt-1">
+                <div
+                  className="h-2 rounded bg-yellow-500"
+                  style={{ width: `${telemetry.Catalyst_Level || '0'}%` }}
+                ></div>
+              </div>
+              <p className="text-sm text-gray-500 mt-1">
+                {telemetry.Catalyst_Level ||'0'}% (Threshold 100%)
+              </p>
+            </div>
                 <div className="grid grid-cols-2 gap-3">
                   <SensorCard label="Speed" value={`${telemetry.WheelBasedSpeed_kph || "--"} km/h`} />
                   <SensorCard label="Engine RPM" value={telemetry.EngineSpeed_rpm || "--"} />
@@ -593,8 +644,8 @@ const Dashboard = () => {
                   <SensorCard label="Throttle" value={`${telemetry.Engine_Throttle_Position || "--"} %`} />
                   <SensorCard label="Coolant Temp" value={`${telemetry.EngineCoolantTemp || "--"} °C`} />
                   <SensorCard label="Fuel Rate" value={`${telemetry.Engine_Fuel_Rate || "--"} L/h`} />
-                  <SensorCard label="Fuel Level" value={`${telemetry.FuelLevel_Percent || "--"} %`} />
-                  <SensorCard label="Adblue" value={`${telemetry.Catalyst_Level || "--"} %`} />
+                  {/* <SensorCard label="Fuel Level" value={`${telemetry.FuelLevel_Percent || "--"} %`} /> */}
+                  {/* <SensorCard label="Adblue" value={`${telemetry.Catalyst_Level || "--"} %`} /> */}
                   <SensorCard label="Battery Voltage" value={`${telemetry.BatteryVoltage_V || "--"} V`} />
                   <SensorCard label="Battery Potential" value={`${telemetry.Battery_Potential_s || "--"} V`} />
                   {/* <SensorCard label="Odometer" value={`${telemetry.Total_VehicleDistance || "--"} km`} /> */}
@@ -678,7 +729,7 @@ function SpeedBox({ device_id }) {
   }, [device_id, speed_data]);
 
   return (
-    <div className="w-[10rem] h-[5rem] flex flex-col items-center justify-center bg-gray-200 py-4 shadow-md rounded-2xl">
+    <div className="w-[8rem] h-[5rem] flex flex-col items-center justify-center bg-gray-200 py-4 shadow-md rounded-2xl">
       <span
         className={`px-2 text-sm font-semibold border rounded-full mb-2 ${
           speed > 0

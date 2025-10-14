@@ -85,14 +85,13 @@ const Home = () => {
       value: "200KM"
     }
   ]);
-  
   },[Device_data])
 
   return (
     <div className='flex'>
       <Navbar />
 
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 h-[100vh] overflow-y-auto">
         <div className='mb-8 font-semibold flex items-center justify-between'>
           Home
           <span className='flex gap-4'>
@@ -109,25 +108,25 @@ const Home = () => {
           ))}
         </section>
 
-        <section className='mb-6 flex gap-4 w'>
-          <div className='w-1/2'>
+        <section className='mb-6'>
+          <div className='mb-6'>
             <div className=' font-semibold flex items-center justify-between mb-6'>
               Chart
-              <span className='flex gap-2 border flex items-center rounded p-2'>
+              <span className='flex gap-2 flex items-center  '>
                 {/* <SlidersHorizontal className='h-5' /> */}
-                <select name="data" id="data" onChange={(e) => setid(e.target.value)}>
+                <select name="data" id="data" className='border rounded p-2' onChange={(e) => setid(e.target.value)}>
                     <option value={""}>Select the option</option>
                   {Device_data.map((ele,index) => (
                     <option key={index} value={ele.device_id}>{ele.device_name}</option>
                   ))}
                 </select>
-                <select name="data" id="data" onChange={(e) => setsensor1(e.target.value)}>
+                <select name="data" id="data" className='border rounded p-2' onChange={(e) => setsensor1(e.target.value)}>
                     <option value={""}>Select the option</option>
                   {sensor.map((ele,index) => (
                     <option key={index} value={ele}>{ele}</option>
                   ))}
                 </select>
-                <span onClick={() => setShowChart(!showChart)}>
+                <span onClick={() => setShowChart(!showChart)} className='border rounded p-2'>
                   {!showChart ? <TableProperties /> : <ChartColumn />}
                 </span>
                 
