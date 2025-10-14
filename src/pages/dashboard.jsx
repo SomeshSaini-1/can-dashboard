@@ -717,16 +717,36 @@ function SpeedBox({ device_id }) {
     return 0;
   }, [apiurl]);
 
-  // ✅ Load speed when device_id changes
+  // // ✅ Load speed when device_id changes
+  // useEffect(() => {
+  //   (async () => {
+  //     const result = await speed_data(device_id);
+  //     if (result) setSpeed(Number(result));
+  //      const interval = setInterval(() => {
+  //     speed_data(device_id);
+  //   }, 10000);
+  //   })();
+  // }, [device_id, speed_data]);
+
   useEffect(() => {
-    (async () => {
-      const result = await speed_data(device_id);
-      if (result) setSpeed(Number(result));
-       const interval = setInterval(() => {
-      speed_data(device_id);
-    }, 1000);
-    })();
-  }, [device_id, speed_data]);
+  let interval;
+  let isMounted = true; // prevent state update on unmounted
+
+  const updateSpeed = async () => {
+    const result = await speed_data(device_id);
+    if (result && isMounted) setSpeed(Number(result));
+  };
+
+  updateSpeed(); // initial fetch
+
+  interval = setInterval(updateSpeed, 10000);
+
+  return () => {
+    isMounted = false;
+    clearInterval(interval);
+  };
+}, [device_id, speed_data]);
+
 
   return (
     <div className="w-[8rem] h-[5rem] flex flex-col items-center justify-center bg-gray-200 py-4 shadow-md rounded-2xl">
