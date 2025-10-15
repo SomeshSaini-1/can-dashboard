@@ -651,10 +651,8 @@ const Dashboard = () => {
                   {/* <SensorCard label="Battery Potential" value={`${telemetry.Battery_Potential_s || "--"} V`} /> */}
                   {/* <SensorCard label="Odometer" value={`${telemetry.Total_VehicleDistance || "--"} km`} /> */}
                   <SensorCard label="Exhaust Ges Temp" value={`${telemetry.ExhaustGasTemp_C || "--"} °C`} />
-                  <SensorCard label="Turbo Boost" value={`${telemetry.Engine_Turbocharger_Boost_Pressure || "--"} kPa`} />
                   <SensorCard label="Cruise Set Speed" value={`${telemetry.CruiseSetSpeed_kph || "--"} km/h`} />
                   <SensorCard label="Intake Temp" value={`${telemetry.IntakeTemp || "--"} °C`} />
-                  <SensorCard label="Air Manifold Temp" value={`${telemetry.Engine_AirIntakeManifold1_Temperature || "--"} °C`} />
                   <SensorCard label="Air Inlet Pressure" value={`${telemetry.Engine_AirInlet_Pressure || "--"} kPa`} />
                   {/* <SensorCard label="Net Battery Current" value={`${telemetry.Net_Battery_Current || "--"} A`} /> */}
                   <SensorCard label="Engine Oil Pressure" value={`${telemetry.EngineOilPressure_kPa || "--"} kPa`} />
@@ -664,6 +662,8 @@ const Dashboard = () => {
                   <SensorCard label="Total Fuel Used" value={`${telemetry.Engine_Total_FuelUsed || "--"} L`} />
                   <SensorCard label="Total Hours" value={`${telemetry.Engine_TotalHours || "--"} h`} />
                   <SensorCard label="Total Revolutions" value={`${telemetry.Engine_Total_Revolutions || "--"}`} />
+                  <SensorCard label="Turbo Boost" value={`${telemetry.Engine_Turbocharger_Boost_Pressure || "--"} kPa`} />
+                  <SensorCard label="Air Manifold Temp" value={`${telemetry.Engine_AirIntakeManifold1_Temperature || "--"} °C`} />
                   {/* <SensorCard label="Turbo Inlet Temp" value={`${telemetry.TurboInletTemp_C || "--"} °C`} /> */}
                   <SensorCard label="Transmission Gear" value={`${telemetry.Transmission_Current_Gear || "--"}`} />
 
