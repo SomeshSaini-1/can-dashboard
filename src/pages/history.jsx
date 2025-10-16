@@ -47,7 +47,7 @@ export default function Adddevice() {
     TurboInletTemp_C: "TurboInTemp",
     Transmission_Current_Gear: "CurrGear",
     Catalyst_Level: "CatLvl",
-    createdAt: "Datetime",
+    // createdAt: "Datetime",
   };
 
   async function fetchDevices() {
@@ -75,13 +75,17 @@ export default function Adddevice() {
     setIsLoading(true);
     console.log("all data ...");
     try {
-      const response = await fetch(`${apiurl}/all_data`, {
-        method: "POST",
-        body: JSON.stringify({
+      const jsondata = JSON.stringify({
           device_id: deviceId,
           limit: limit,
           page: page,
-        }),
+        });
+
+        console.log(jsondata);
+
+      const response = await fetch(`${apiurl}/all_data`, {
+        method: "POST",
+        body: jsondata,
         headers: { "Content-Type": "application/json" },
       });
       if (!response.ok) throw new Error("Failed to fetch sensor data. ");
@@ -129,6 +133,13 @@ export default function Adddevice() {
   }, [deviceId, page,limit]);
 
 
+  function convertUTCtoIST(utcDateString) {
+    // utcDateString: e.g., "2025-10-16T12:10:04.573Z"
+    const utcDate = new Date(utcDateString);
+    const istDateString = utcDate.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+    return istDateString;
+}
+  
   return (
     <div className="flex min-h-screen">
       <Sidebar />
@@ -199,6 +210,8 @@ export default function Adddevice() {
                         {keydata[key]}
                       </th>
                     ))}
+                    
+                <th scope="col" className="border px-3 py-2">Date-Time</th>
                 <th scope="col" className="border px-3 py-2">
                   Action
                 </th>
@@ -223,6 +236,7 @@ export default function Adddevice() {
                             {ele[key] ?? "N/A"}
                           </td>
                         ))}
+                        <td className="border px-3 py-2" >{convertUTCtoIST(ele.createdAt) ?? "--"}</td>
                     <td className="flex items-center justify-center gap-2 border px-3 py-2">
                       <Edit className="text-green-400 cursor-pointer" />
                     </td>
@@ -232,7 +246,7 @@ export default function Adddevice() {
           </table>
         </div>
 
-        <div className="flex items-center justify-center gap-4 mt-4">
+       {sensorData.length > 9 && <div className="flex items-center justify-center gap-4 mt-4">
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
             disabled={page === 1}
@@ -247,7 +261,7 @@ export default function Adddevice() {
           >
             Next
           </button>
-        </div>
+        </div>}
       </div>
     </div>
   );

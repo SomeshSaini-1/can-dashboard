@@ -15,18 +15,23 @@ const Chart = ({ sensorValue = "EngineSpeed_rpm", height = 350, showChart = true
   const fetchDrivers = async () => {
     try {
       setLoading(true);
+      const jsondata = JSON.stringify({
+          device_id: deviceid,
+          sensorKey: sensorValue || "WheelBasedSpeed_kph",
+          limit: 100,
+          page: 1
+        });
+
+        console.log(jsondata ,"json data")
+
       const res = await fetch(`${apiurl}/get_all_data`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          device_id: deviceid,
-          sensorKey: sensorValue,
-          limit: 100,
-          page: 1
-        })
+        body: jsondata
       });
 
       const data = await res.json();
+      console.log(data,"chart data")
       setDriver_data(Array.isArray(data.query) ? data.query : []);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -42,8 +47,8 @@ const Chart = ({ sensorValue = "EngineSpeed_rpm", height = 350, showChart = true
   // ✅ Chart Config
   const series = [
     {
-      name: sensorValue,
-      data: Driver_data.map((ele) => Number(ele[sensorValue]) || 0),
+      name: sensorValue || "WheelBasedSpeed_kph",
+      data: Driver_data.map((ele) => Number(ele[sensorValue || "WheelBasedSpeed_kph"]) || 0),
     },
   ];
 
@@ -89,6 +94,7 @@ const Chart = ({ sensorValue = "EngineSpeed_rpm", height = 350, showChart = true
           <table className="min-w-full border border-gray-300 text-sm">
             <thead className="bg-gray-200 dark:bg-gray-700">
               <tr>
+                <th className='border px-3 py-2 text-left'>Device ID</th>
                 <th className="border px-3 py-2 text-left">Date/Time</th>
                 <th className="border px-3 py-2 text-left">{sensorValue}</th>
               </tr>
@@ -97,6 +103,9 @@ const Chart = ({ sensorValue = "EngineSpeed_rpm", height = 350, showChart = true
               {Driver_data.length > 0 ? (
                 Driver_data.map((ele, index) => (
                   <tr key={index} className="odd:bg-white even:bg-gray-50 dark:odd:bg-gray-800 dark:even:bg-gray-700">
+                    <td className='border px-3 py-2'>
+                      {ele.device_id}
+                    </td>
                     <td className="border px-3 py-2">
                       {ele.createdAt || ele.created_at || '--'}
                     </td>

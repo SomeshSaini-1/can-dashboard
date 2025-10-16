@@ -8,7 +8,7 @@ export default function Adddevice() {
   const apiurl = import.meta.env.VITE_API_URL;
 
   const [deviceData, setDeviceData] = useState([]);
-  const [deviceId, setDeviceId] = useState("all");
+  const [deviceId, setDeviceId] = useState();
   const [sensorData, setSensorData] = useState([]);
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +27,7 @@ export default function Adddevice() {
   }
 
   const [Alart, setAlart] = useState("over_speed");
-  // console.log(Alart)
+  console.log(Alart)
 
   const keydata = {
     Total_VehicleDistance: "TotVehDist",
@@ -85,13 +85,15 @@ export default function Adddevice() {
     setIsLoading(true);
     console.log("all data ...");
     try {
+      const jsondata = JSON.stringify({
+          "alert_type": Alart,
+          limit: limit,
+          page: page,
+        });
+      console.log(jsondata);
       const response = await fetch(`${apiurl}/get_alert`, {
         method: "POST",
-        body: JSON.stringify({
-          "alert_type": Alart,
-          // limit: limit,
-          // page: page,
-        }),
+        body: jsondata,
         headers: { "Content-Type": "application/json" },
       });
       if (!response.ok) throw new Error("Failed to fetch sensor data. ");
@@ -134,6 +136,56 @@ export default function Adddevice() {
   }, [deviceId, page, limit]);
 
 
+  const table = {
+    "over_speed" : {
+      "overSpeed" :"over Speed",
+      "duration" :"Duration",
+      "distanceTravelled" :"Distance Travlled",
+
+      "location":"Location"
+    },
+    "HarshAcceleration" : {
+
+      "location":"Location"
+    },
+    "HardBrake":{
+
+      "location":"Location"
+    },
+    "Stoppage":{
+      "Stoppagetime":"Stoppage Time",
+      "location":"Location"
+    },
+    "Freerun": {
+      "Free_running" :"Free running",
+      "speed":"Speed",
+      "distanceTravelled" :"Distance Travlled",
+      "dateTime":"Date-Time",
+      "location":"Location"
+    },
+    "Geofence":{
+      "motion":"Motion",
+      "dateTime":"Date-Time",
+      "location":"Location"
+    },
+    "Idling": {
+      "Idling_time" :"Idling Time",
+      "Fuel_consumed" : "Fuel Consumed",
+      "Ambient_Temperature" :"Ambient Temperature",
+      "dateTime":"Date-Time",
+      "location":"Location"
+    }
+  }
+  
+ 
+  
+  function convertUTCtoIST(utcDateString) {
+    // utcDateString: e.g., "2025-10-16T12:10:04.573Z"
+    const utcDate = new Date(utcDateString);
+    const istDateString = utcDate.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+    return istDateString;
+}
+
 
   return (
     <div className="flex min-h-screen">
@@ -153,7 +205,7 @@ export default function Adddevice() {
           <div className="grid grid-cols-[1fr,1fr,6fr,1fr] gap-4 items-center mb-6">
             <select
               value={limit}
-              onChange={(e) => setlimit(Number(e.target.value))}
+              onChange={(e) => setlimit(e.target.value)}
               className="border-2 border-gray-200 p-2 rounded"
             >
               <option value="10">10</option>
@@ -197,7 +249,43 @@ export default function Adddevice() {
           </div>
 
         <div className="overflow-auto">
-          <table className="w-full text-sm text-center border rounded bg-white">
+
+<div className="overflow-auto">
+  <table className="w-full text-sm text-center border rounded bg-white">
+    <thead>
+      <tr className="bg-gray-200">
+        <th scope="col" className="border px-3 py-2">Sr.</th>
+        <th scope="col" className="border px-3 py-2">Device Id</th>
+        {Object.entries(table[Alart]).map(([key, label]) => (
+          <th key={key} scope="col" className="border px-3 py-2">{label}</th>
+        ))}
+        
+          <th  scope="col" className="border px-3 py-2">Date-Time</th>
+      </tr>
+    </thead>
+    <tbody>
+      {/* {sensorData.filter(ele => {!deviceId || ele.data?.vehicle === deviceId}).map((ele, index) => ( */}
+      {sensorData
+  .filter(ele => !deviceId || ele.data?.vehicle === deviceId)
+  .map((ele, index) => (
+        <tr key={index} className="hover:bg-gray-50">
+          <td className="border px-3 py-2">{index + 1}.</td>
+          <td className="border px-3 py-2">{ele.data?.vehicle || "N/A"}</td>
+          {Object.keys(table[Alart]).map((key) => (
+            <td key={key} className="border px-3 py-2">
+              {ele.data?.[key] ?? "N/A"}
+            </td>
+          ))}
+          
+            <td className="border px-3 py-2">{convertUTCtoIST(ele.data?.dateTime) ?? "N/A"}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+
+          {/* <table className="w-full text-sm text-center border rounded bg-white">
             <thead>
               <tr className="bg-gray-200">
                 <th scope="col" className="border px-3 py-2">
@@ -206,15 +294,7 @@ export default function Adddevice() {
                 <th scope="col" className="border px-3 py-2">
                   Device Id
                 </th>
-                {/* {sensorData[0] &&
-            Object.keys(sensorData[0])
-            .filter((key) => keydata[key])
-            .map((key, index) => (
-              <th scope="col" className="border px-3 py-2" key={index}>
-              {keydata[key]}
-              </th>
-            ))
-          } */}
+          
 
                 <th scope="col" className="border px-3 py-2">
                   Over Speed
@@ -228,9 +308,9 @@ export default function Adddevice() {
                 <th scope="col" className="border px-3 py-2">
                   Date-Time
                 </th>
-                {/* <th scope="col" className="border px-3 py-2">
+                <th scope="col" className="border px-3 py-2">
                   location
-                </th> */}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -249,12 +329,12 @@ export default function Adddevice() {
                     <td className="border px-3 py-2">{ele.data.duration}</td>
                     <td className="border px-3 py-2">{ele.data.distanceTravelled}</td>
                     <td className="border px-3 py-2">{ele.data.dateTime}</td>
-                    {/* <td className="border px-3 py-2">{ele.data.distanceTravelled}</td> */}
+                    <td className="border px-3 py-2">{ele.data?.location || "--"}</td>
                     
                   </tr>
                 ))}
             </tbody>
-          </table>
+          </table> */}
         </div>
 
         { sensorData.length > 10 && <div className="flex items-center justify-center gap-4 mt-4">

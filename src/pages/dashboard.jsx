@@ -492,6 +492,15 @@ const Dashboard = () => {
   }, [selected, fetchDeviceData]);
 
   const [search,setsearch] = useState('');
+
+  
+  function convertUTCtoIST(utcDateString) {
+    // utcDateString: e.g., "2025-10-16T12:10:04.573Z"
+    const utcDate = new Date(utcDateString);
+    const istDateString = utcDate.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+    return istDateString;
+}
+
   return (
     <div className="flex">
       <Navbar />
@@ -585,7 +594,7 @@ const Dashboard = () => {
                 <Gauge /> {telemetry?.Total_VehicleDistance || "--"} km
               </p>
               <p className="text-gray-500 my-2">
-                Last Updated On: {telemetry?.updatedAt || selected.lastUpdated}
+                Last Updated On: {convertUTCtoIST(telemetry?.updatedAt) || selected.lastUpdated}
               </p>
             </div>
 
@@ -638,23 +647,16 @@ const Dashboard = () => {
               </p>
             </div>
                 <div className="grid grid-cols-2 gap-3">
-                  {/* <SensorCard label="Speed" value={`${telemetry.WheelBasedSpeed_kph || "--"} km/h`} /> */}
                   <SensorCard label="Engine RPM" value={telemetry.EngineSpeed_rpm || "--"} />
-                  {/* <SensorCard label="Engine Load" value={`${telemetry.EnginePercentLoad || "--"} %`} /> */}
                   <SensorCard label="Engine Load (Alt)" value={`${telemetry.Engine_Load || "--"} %`} />
                   <SensorCard label="Throttle" value={`${telemetry.Engine_Throttle_Position || "--"} %`} />
                   <SensorCard label="Coolant Temp" value={`${telemetry.EngineCoolantTemp || "--"} °C`} />
                   <SensorCard label="Fuel Rate" value={`${telemetry.Engine_Fuel_Rate || "--"} L/h`} />
-                  {/* <SensorCard label="Fuel Level" value={`${telemetry.FuelLevel_Percent || "--"} %`} /> */}
-                  {/* <SensorCard label="Adblue" value={`${telemetry.Catalyst_Level || "--"} %`} /> */}
                   <SensorCard label="Battery Voltage" value={`${telemetry.BatteryVoltage_V || "--"} V`} />
-                  {/* <SensorCard label="Battery Potential" value={`${telemetry.Battery_Potential_s || "--"} V`} /> */}
-                  {/* <SensorCard label="Odometer" value={`${telemetry.Total_VehicleDistance || "--"} km`} /> */}
                   <SensorCard label="Exhaust Ges Temp" value={`${telemetry.ExhaustGasTemp_C || "--"} °C`} />
                   <SensorCard label="Cruise Set Speed" value={`${telemetry.CruiseSetSpeed_kph || "--"} km/h`} />
                   <SensorCard label="Intake Temp" value={`${telemetry.IntakeTemp || "--"} °C`} />
                   <SensorCard label="Air Inlet Pressure" value={`${telemetry.Engine_AirInlet_Pressure || "--"} kPa`} />
-                  {/* <SensorCard label="Net Battery Current" value={`${telemetry.Net_Battery_Current || "--"} A`} /> */}
                   <SensorCard label="Engine Oil Pressure" value={`${telemetry.EngineOilPressure_kPa || "--"} kPa`} />
                   <SensorCard label="Crankcase Pressure" value={`${telemetry.Engine_Crankcase_Pressure || "--"} kPa`} />
                   <SensorCard label="Pedal Position" value={`${telemetry.Pedal_Position || "--"} %`} />
@@ -664,8 +666,17 @@ const Dashboard = () => {
                   <SensorCard label="Total Revolutions" value={`${telemetry.Engine_Total_Revolutions || "--"}`} />
                   <SensorCard label="Turbo Boost" value={`${telemetry.Engine_Turbocharger_Boost_Pressure || "--"} kPa`} />
                   <SensorCard label="Air Manifold Temp" value={`${telemetry.Engine_AirIntakeManifold1_Temperature || "--"} °C`} />
-                  {/* <SensorCard label="Turbo Inlet Temp" value={`${telemetry.TurboInletTemp_C || "--"} °C`} /> */}
                   <SensorCard label="Transmission Gear" value={`${telemetry.Transmission_Current_Gear || "--"}`} />
+
+
+                  {/* <SensorCard label="Turbo Inlet Temp" value={`${telemetry.TurboInletTemp_C || "--"} °C`} /> */}
+                  {/* <SensorCard label="Speed" value={`${telemetry.WheelBasedSpeed_kph || "--"} km/h`} /> */}
+                  {/* <SensorCard label="Engine Load" value={`${telemetry.EnginePercentLoad || "--"} %`} /> */}
+                  {/* <SensorCard label="Fuel Level" value={`${telemetry.FuelLevel_Percent || "--"} %`} /> */}
+                  {/* <SensorCard label="Adblue" value={`${telemetry.Catalyst_Level || "--"} %`} /> */}
+                  {/* <SensorCard label="Battery Potential" value={`${telemetry.Battery_Potential_s || "--"} V`} /> */}
+                  {/* <SensorCard label="Odometer" value={`${telemetry.Total_VehicleDistance || "--"} km`} /> */}
+                  {/* <SensorCard label="Net Battery Current" value={`${telemetry.Net_Battery_Current || "--"} A`} /> */}
 
                 </div>
               </div>

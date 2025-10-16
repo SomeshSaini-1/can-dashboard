@@ -51,6 +51,7 @@ const Home = () => {
     });
     const res = await url.json();
     console.log(res);
+
     setDevice_data(res);
   }
 
@@ -60,7 +61,7 @@ const Home = () => {
     fetchDevices();
   }, []);
 
-  const [sensor1, setsensor1] = useState("");
+  const [sensor1, setsensor1] = useState("WheelBasedSpeed_kph");
   const [showChart, setShowChart] = useState(true); // toggle state
   const [id,setid] = useState("");
 
