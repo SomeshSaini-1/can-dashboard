@@ -100,14 +100,14 @@ const Home = () => {
             <button className='border-2 border-blue-400 rounded px-2 py-1 flex'><Plus /> Report Add</button>
           </span>
         </div>
-        <section className='w-full flex flex-warp gap-4 mb-8'>
+        {/* <section className='w-full flex flex-warp gap-4 mb-8'>
           {data.map((ele, index) => (
             <div key={index} className='w-auto flex items-center gap-4  border-2 rounded shadow p-6'>
               <h2 className='text-2xl text-gray-500 font-bold'>{ele.label}</h2>
               <p className='text-xl text-gray-500'>{ele.value}</p>
             </div>
           ))}
-        </section>
+        </section> */}
 
         <section className='mb-6'>
           <div className='mb-6'>
@@ -138,6 +138,7 @@ const Home = () => {
           </div>
 
           <div className='flex-1 overflow-auto'>
+            <div className='text-xl text-gray-500 p-2 '>Total Devices ({Device_data.length}) </div>
             <table className='min-w-full text-sm text-center border rounded'>
               <thead>
                 <tr>

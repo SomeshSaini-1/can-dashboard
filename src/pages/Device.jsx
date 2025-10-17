@@ -99,6 +99,23 @@ const [Search,setSearch] = useState();
     }
   }
 
+  
+  const [Driver_data, setDriver_data] = useState([]);
+    async function fetchDrivers() {
+      const url = await fetch(`${apiurl}/get_driver`, {
+        method: "POST",
+        body: JSON.stringify({ driver_name: "all" }),
+        headers: { "Content-Type": "application/json" }
+      });
+      const res = await url.json();
+      console.log(res);
+      setDriver_data(res);
+    }
+
+  useEffect(() => {
+    fetchDrivers();
+  }, [apiurl]);
+  
 
   return (
     <div className="flex">
@@ -133,7 +150,7 @@ const [Search,setSearch] = useState();
                   type: "select",
                   options: ["Test", "Deployed"]
                 },
-                { label: "Assing To", name: "Assing_to" },
+                { label: "Assing To", name: "Assing_to",type : "select", options : Driver_data.map(ele => {return ele.driver_name}) },
                 { label: "Date", name: "date", type: "date" }
               ].map(({ label, name, type, options }) => (
                 <div className="flex flex-col" key={name}>

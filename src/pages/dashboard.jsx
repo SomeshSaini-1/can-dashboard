@@ -667,6 +667,7 @@ const Dashboard = () => {
                   <SensorCard label="Turbo Boost" value={`${telemetry.Engine_Turbocharger_Boost_Pressure || "--"} kPa`} />
                   <SensorCard label="Air Manifold Temp" value={`${telemetry.Engine_AirIntakeManifold1_Temperature || "--"} °C`} />
                   <SensorCard label="Transmission Gear" value={`${telemetry.Transmission_Current_Gear || "--"}`} />
+                  <SensorCard label="Ambient Temp" value={`${telemetry.Net_Battery_Current || "--"} °C`} />
 
 
                   {/* <SensorCard label="Turbo Inlet Temp" value={`${telemetry.TurboInletTemp_C || "--"} °C`} /> */}
@@ -676,7 +677,6 @@ const Dashboard = () => {
                   {/* <SensorCard label="Adblue" value={`${telemetry.Catalyst_Level || "--"} %`} /> */}
                   {/* <SensorCard label="Battery Potential" value={`${telemetry.Battery_Potential_s || "--"} V`} /> */}
                   {/* <SensorCard label="Odometer" value={`${telemetry.Total_VehicleDistance || "--"} km`} /> */}
-                  {/* <SensorCard label="Net Battery Current" value={`${telemetry.Net_Battery_Current || "--"} A`} /> */}
 
                 </div>
               </div>
