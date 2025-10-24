@@ -1,7 +1,7 @@
 
-// pages/Adddevice.jsx (Main Component)
-import { Edit } from "lucide-react";
+// import { Edit } from "lucide-react";
 import Sidebar from "../components/Nav";
+import * as XLSX from 'xlsx';
 import { useEffect, useState } from "react";
 
 export default function Adddevice() {
@@ -16,7 +16,7 @@ export default function Adddevice() {
   const [limit, setlimit] = useState(10);
   const [collapsed, setCollapsed] = useState(false);
 
-  const alart_type = {
+  const Alert_type = {
     "over_speed": "Over Speed",
     "HarshAcceleration": "Harsh Acceleration",
     "Idling": "Idling",
@@ -26,8 +26,8 @@ export default function Adddevice() {
     "Geofence": "Geofence"
   }
 
-  const [Alart, setAlart] = useState("over_speed");
-  console.log(Alart)
+  const [Alert, setAlert] = useState("over_speed");
+  console.log(Alert)
 
   const keydata = {
     Total_VehicleDistance: "TotVehDist",
@@ -86,7 +86,7 @@ export default function Adddevice() {
     console.log("all data ...");
     try {
       const jsondata = JSON.stringify({
-        "alert_type": Alart,
+        "alert_type": Alert,
         limit: limit,
         page: page,
       });
@@ -107,24 +107,50 @@ export default function Adddevice() {
       setIsLoading(false);
     }
   }
-
   const exportData = () => {
-    const headers = Object.keys(keydata).filter((key) => sensorData[0]?.[key]);
-    const csvContent = [
-      ["Device ID", ...headers.map((key) => keydata[key])].join(","),
-      ...sensorData.map((row) =>
-        [row.device_id, ...headers.map((key) => row[key] ?? "N/A")].join(",")
-      ),
-    ].join("\n");
+    if (sensorData.length === 0) {
+      alert('No data to export');
+      return;
+    }
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "sensor_data.csv";
-    a.click();
-    window.URL.revokeObjectURL(url);
+    // Get current timestamp for filename
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const filename = `alerts_${Alert}_${timestamp}.xlsx`;
+
+    // Get table element
+    const table = document.getElementById('datatable');
+    if (!table) {
+      alert('Table not found');
+      return;
+    }
+
+    try {
+      const wb = XLSX.utils.table_to_book(table, { sheet: 'Alerts' });
+      XLSX.writeFile(wb, filename);
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Failed to export data');
+    }
   };
+
+
+  // const exportData = () => {
+  //   const headers = Object.keys(keydata).filter((key) => sensorData[0]?.[key]);
+  //   const csvContent = [
+  //     ["Device ID", ...headers.map((key) => keydata[key])].join(","),
+  //     ...sensorData.map((row) =>
+  //       [row.device_id, ...headers.map((key) => row[key] ?? "N/A")].join(",")
+  //     ),
+  //   ].join("\n");
+
+  //   const blob = new Blob([csvContent], { type: "text/csv" });
+  //   const url = window.URL.createObjectURL(blob);
+  //   const a = document.createElement("a");
+  //   a.href = url;
+  //   a.download = "sensor_data.csv";
+  //   a.click();
+  //   window.URL.revokeObjectURL(url);
+  // };
 
 
   useEffect(() => {
@@ -134,7 +160,7 @@ export default function Adddevice() {
   
   useEffect(() => {
     all_data();
-  }, [deviceId, Alart, page, limit]);
+  }, [deviceId, Alert, page, limit]);
 
 
   const table = {
@@ -142,19 +168,22 @@ export default function Adddevice() {
       "overSpeed": "over Speed",
       "duration": "Duration",
       "distanceTravelled": "Distance Travlled",
-
+      "dateTime":"Date-Time",
       "location": "Location"
     },
     "HarshAcceleration": {
 
+      "dateTime":"Date-Time",
       "location": "Location"
     },
     "HardBrake": {
 
+      "dateTime":"Date-Time",
       "location": "Location"
     },
     "Stoppage": {
       "Stoppagetime": "Stoppage Time",
+      "dateTime":"Date-Time",
       "location": "Location"
     },
     "Freerun": {
@@ -170,10 +199,11 @@ export default function Adddevice() {
       "location": "Location"
     },
     "Idling": {
-      "Idling_time": "Idling Time",
-      "Fuel_consumed": "Fuel Consumed",
+      "idlingDuration": "Idling Time",
+      // "Fuel_consumed": "Fuel Consumed",
       "Ambient_Temperature": "Ambient Temperature",
-      "dateTime": "Date-Time",
+      "startTime": "From",
+      "endTime":"To",
       "location": "Location"
     }
   }
@@ -226,16 +256,16 @@ export default function Adddevice() {
             ))}
           </select>
           <div className="flex flex-1 flex-wrap gap-2 items-center">
-            {Object.entries(alart_type).map(([key, value], index) => (
+            {Object.entries(Alert_type).map(([key, value], index) => (
               <label htmlFor={key} key={index}>
                 <input
                   type="radio"
                   name="alertType"
                   id={key}
                   value={key}
-                  checked={Alart === key}
+                  checked={Alert === key}
                   className="mx-2 "
-                  onChange={(e) => setAlart(e.target.value)}
+                  onChange={(e) => setAlert(e.target.value)}
                 />
                 {value}
               </label>
@@ -252,94 +282,46 @@ export default function Adddevice() {
         <div className="overflow-auto">
 
           <div className="overflow-auto">
-            <table className="w-full text-sm text-center border rounded bg-white">
+            <table className="w-full text-sm text-center border rounded bg-white" id='datatable'>
               <thead>
                 <tr className="bg-gray-200">
                   <th scope="col" className="border px-3 py-2">Sr.</th>
                   <th scope="col" className="border px-3 py-2">Device Id</th>
-                  {Object.entries(table[Alart]).map(([key, label]) => (
+                  {Object.entries(table[Alert]).map(([key, label]) => (
                     <th key={key} scope="col" className="border px-3 py-2">{label}</th>
                   ))}
 
-                  <th scope="col" className="border px-3 py-2">Date-Time</th>
+                  {/* <th scope="col" className="border px-3 py-2">Date-Time</th>    */}
                 </tr>
               </thead>
               <tbody>
                 
-                {/* {sensorData.filter(ele => {!deviceId || ele.data?.vehicle === deviceId}).map((ele, index) => ( */}
                 {sensorData
                   .filter(ele => !deviceId || ele.data?.vehicle === deviceId)
                   .map((ele, index) => (
                     <tr key={index} className="hover:bg-gray-50">
                       <td className="border px-3 py-2">{index + 1}.</td>
                       <td className="border px-3 py-2">{ele.data?.vehicle || "N/A"}</td>
-                      {Object.keys(table[Alart]).map((key) => (
+                      {Object.keys(table[Alert]).map((key) => (
                         <td key={key} className="border px-3 py-2">
-                          {ele.data?.[key] ?? "N/A"}
+                          {(key === "startTime" || key === "endTime" || key === "dateTime")
+                            ? (ele.data?.[key] ? convertUTCtoIST(ele.data?.[key]) : "N/A")
+                            : (ele.data?.[key] ?? "N/A")}
                         </td>
                       ))}
-
-                      <td className="border px-3 py-2">{convertUTCtoIST(ele.data?.dateTime) ?? "N/A"}</td>
+                      {/* {Alert !== "idling" && (
+                        <td className="border px-3 py-2">
+                          {convertUTCtoIST(ele.data?.dateTime) ?? "N/A"}
+                        </td>
+                      )} */}
                     </tr>
                   ))}
-              </tbody>
-            </table>
-          </div>
-
-
-          {/* <table className="w-full text-sm text-center border rounded bg-white">
-            <thead>
-              <tr className="bg-gray-200">
-                <th scope="col" className="border px-3 py-2">
-                  Sr.
-                </th>
-                <th scope="col" className="border px-3 py-2">
-                  Device Id
-                </th>
-          
-
-                <th scope="col" className="border px-3 py-2">
-                  Over Speed
-                </th>
-                <th scope="col" className="border px-3 py-2">
-                  Duration
-                </th>
-                <th scope="col" className="border px-3 py-2">
-                  Distance Travlled
-                </th>
-                <th scope="col" className="border px-3 py-2">
-                  Date-Time
-                </th>
-                <th scope="col" className="border px-3 py-2">
-                  location
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {sensorData
-                // .filter(
-                //   (el) =>
-                //   (!search ||
-                //     el.device_id?.toLowerCase().includes(search.toLowerCase())) &&
-                //   (!Alart || el.alert_type === Alart)
-                // )
-                .map((ele, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="border px-3 py-2">{index + 1}.</td>
-                    <td className="border px-3 py-2">{ele.data.vehicle}</td>
-                    <td className="border px-3 py-2">{ele.data.overSpeed}</td>
-                    <td className="border px-3 py-2">{ele.data.duration}</td>
-                    <td className="border px-3 py-2">{ele.data.distanceTravelled}</td>
-                    <td className="border px-3 py-2">{ele.data.dateTime}</td>
-                    <td className="border px-3 py-2">{ele.data?.location || "--"}</td>
-                    
-                  </tr>
-                ))}
-            </tbody>
-          </table> */}
+                </tbody>
+                </table>
+                </div>
         </div>
 
-        {sensorData.length > 10 && <div className="flex items-center justify-center gap-4 mt-4">
+        {sensorData.length > 9 && <div className="flex items-center justify-center gap-4 mt-4">
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
             disabled={page === 1}

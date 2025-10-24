@@ -100,22 +100,81 @@ export default function Adddevice() {
     }
   }
 
-  const exportData = () => {
-    const headers = Object.keys(keydata).filter((key) => sensorData[0]?.[key]);
-    const csvContent = [
-      ["Device ID", ...headers.map((key) => keydata[key])].join(","),
-      ...sensorData.map((row) =>
-        [row.device_id, ...headers.map((key) => row[key] ?? "N/A")].join(",")
-      ),
-    ].join("\n");
 
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "sensor_data.csv";
-    a.click();
-    window.URL.revokeObjectURL(url);
+  
+  const [showfrom, setshowfrom] = useState();
+  const [from_to_data, setfrom_to_data] = useState({
+    From: "", To: ""
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setfrom_to_data((prev) => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!from_to_data.From || !from_to_data.To) {
+      alert("Please select both From and To dates.");
+      return;
+    }
+    const download_link = `https://oxymora-can-api.otplai.com/api/Get_data_excle?device_id=${deviceId}&from=${from_to_data.From}&to=${from_to_data.To}`;
+    window.open(download_link, '_blank', 'noopener,noreferrer');
+    setshowfrom(false);
+  };
+  
+  const from_to = () => {
+    return (
+      <div className='absolute w-full h-full inset-0' onClick={() => setshowfrom(false)}>
+        <form
+          onClick={(e) => e.stopPropagation()}
+          className="absolute p-6 w-[15rem] bg-[#fff] text-[#000] rounded-lg shadow-xl space-y-4 z-[50]"
+          style={{ top: "9rem", right: "1rem" }}
+        >
+          {/* From Date Input */}
+          <div className="flex flex-col space-y-1">
+            <label className="text-sm font-medium text-left">From</label>
+            <input
+              type="date"
+              name="From"
+              value={from_to_data.From}
+              onChange={handleChange}
+              className="p-2 border rounded bg-[var(--bg)]  text-[var(--white)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          {/* To Date Input */}
+          <div className="flex flex-col space-y-1">
+            <label className="text-sm font-medium text-left">To</label>
+            <input
+              type="date"
+              name="To"
+              value={from_to_data.To}
+              onChange={handleChange}
+              className="p-2 border rounded bg-[var(--bg)]  text-[var(--white)] focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+
+          {/* Download Button */}
+          <div className="pt-2 flex gap-4">
+            <button
+              type='submit'
+              onClick={handleSubmit}
+              className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+            >
+              Excel
+            </button>
+
+            
+          </div>
+        </form>
+      </div>
+    );
   };
 
   // // Debounce search input
@@ -185,11 +244,14 @@ export default function Adddevice() {
             /> */}
           </div>
           <button
-            onClick={exportData}
+            onClick={() => setshowfrom(!showfrom)}
             className="border-2 border-blue-400 rounded px-4 py-2 text-blue-600 hover:bg-blue-100"
           >
             Export Data
           </button>
+
+          {showfrom && from_to()}
+
         </div>
 
         <div className="overflow-auto ">
@@ -212,9 +274,7 @@ export default function Adddevice() {
                     ))}
                     
                 <th scope="col" className="border px-3 py-2">Date-Time</th>
-                <th scope="col" className="border px-3 py-2">
-                  Action
-                </th>
+                
               </tr>
             </thead>
             <tbody>
@@ -237,9 +297,7 @@ export default function Adddevice() {
                           </td>
                         ))}
                         <td className="border px-3 py-2" >{convertUTCtoIST(ele.createdAt) ?? "--"}</td>
-                    <td className="flex items-center justify-center gap-2 border px-3 py-2">
-                      <Edit className="text-green-400 cursor-pointer" />
-                    </td>
+                    
                   </tr>
                 ))}
             </tbody>
