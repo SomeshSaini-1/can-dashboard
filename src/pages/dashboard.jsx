@@ -659,6 +659,7 @@ const Dashboard = () => {
                   <SensorCard label="Air Inlet Pressure" value={`${telemetry.Engine_AirInlet_Pressure || "--"} kPa`} />
                   <SensorCard label="Engine Oil Pressure" value={`${telemetry.EngineOilPressure_kPa || "--"} kPa`} />
                   <SensorCard label="Crankcase Pressure" value={`${telemetry.Engine_Crankcase_Pressure || "--"} kPa`} />
+                  <SensorCard label="Ambient Temp" value={`${telemetry.Net_Battery_Current || "--"} °C`} />
                   <SensorCard label="Pedal Position" value={`${telemetry.Pedal_Position || "--"} %`} />
                   <SensorCard label="Trip Fuel" value={`${telemetry.Engine_TripFuel || "--"} L`} />
                   <SensorCard label="Total Fuel Used" value={`${telemetry.Engine_Total_FuelUsed || "--"} L`} />
@@ -667,7 +668,6 @@ const Dashboard = () => {
                   <SensorCard label="Turbo Boost" value={`${telemetry.Engine_Turbocharger_Boost_Pressure || "--"} kPa`} />
                   <SensorCard label="Air Manifold Temp" value={`${telemetry.Engine_AirIntakeManifold1_Temperature || "--"} °C`} />
                   <SensorCard label="Transmission Gear" value={`${telemetry.Transmission_Current_Gear || "--"}`} />
-                  <SensorCard label="Ambient Temp" value={`${telemetry.Net_Battery_Current || "--"} °C`} />
 
 
                   {/* <SensorCard label="Turbo Inlet Temp" value={`${telemetry.TurboInletTemp_C || "--"} °C`} /> */}

@@ -25,7 +25,7 @@ const directionIcon = angle => L.divIcon({
   iconAnchor: [30, 50],
 });
 
-const Map = ({ height = 500 }) => {
+const Map = ({ height = 100 }) => {
   const defaultCenter = [26.327573174041746, 94.42290457351207];
 
   const positions = [
@@ -49,7 +49,7 @@ const Map = ({ height = 500 }) => {
         center={defaultCenter}
         zoom={5}
         style={{
-          height: `100vh`,
+          height: `${height}vh`,
           width: '100%'
         }}
       >

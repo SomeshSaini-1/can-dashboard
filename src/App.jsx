@@ -12,6 +12,7 @@ import Help from './pages/Help';
 import Setting from './pages/Setting';
 import Alert_page from './pages/Alert';
 import History from "./pages/history";
+import Geofencing from "./pages/addgeofencing";
 
 // Route protection component
 function ProtectedRoute() {
@@ -38,6 +39,10 @@ function App() {
           element: <Dashboard />
         // }
       // ]
+    },
+    {
+      path : "/AddGeofencing",
+      element : <Geofencing />
     },
     {
       path:"/AddDevice",

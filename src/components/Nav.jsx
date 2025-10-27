@@ -8,7 +8,8 @@ import {
   HelpCircle,
   LogOut,
   TriangleAlert,
-  ClipboardClock
+  ClipboardClock,
+  Radius
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -23,6 +24,7 @@ export default function Sidebar() {
     { name: "Dashboard", icon: <LayoutDashboard size={20} />, link:"/Home" },
     { name: "Devices", icon: <Package size={20} />, link:"/AddDevice" },
     { name: "Users", icon: <Users size={20} />, link:"/User" },
+    { name: "AddGeofencing", icon: <Radius size={20} />, link:"/AddGeofencing" }
   ];
 
   const deploy = [
