@@ -18,7 +18,7 @@ import { logout } from "../redux/authSlice";
 export default function Sidebar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   const menu = [
     { name: "Dashboard", icon: <LayoutDashboard size={20} />, link:"/Home" },

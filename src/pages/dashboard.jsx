@@ -558,7 +558,7 @@ const Dashboard = () => {
 
       {/* Map + Details */}
       <div className="flex-1 relative">
-        <MapComponent />
+        <MapComponent device={selected?.device_id} />
 
         {selected && (
           <div className="absolute top-20 left-8 w-[24rem] bg-gray-100 p-4 rounded shadow z-[999] h-[90vh] overflow-y-auto">
