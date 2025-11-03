@@ -557,11 +557,10 @@ const Dashboard = () => {
       </div>
 
       {/* Map + Details */}
-      <div className="flex-1 relative">
-        <MapComponent device={selected?.device_id} />
-
+      <div className="flex flex-1 h-screen">
         {selected && (
-          <div className="absolute top-20 left-8 w-[24rem] bg-gray-100 p-4 rounded shadow z-[999] h-[90vh] overflow-y-auto">
+          // <div className="absolute top-20 left-8 w-[24rem] bg-gray-100 p-4 rounded shadow z-[999] h-[90vh] overflow-y-auto">
+          <div className=" w-[24rem] bg-gray-100 p-4 rounded shadow z-[999] h-screen overflow-y-auto">
             <div
               className="flex justify-end mb-2 cursor-pointer"
               onClick={() => setSelected(null)}
@@ -685,6 +684,10 @@ const Dashboard = () => {
             )}
           </div>
         )}
+
+        <div className="flex-1">
+           <MapComponent device={selected?.device_id} />
+        </div>
 
       </div>
     </div>
