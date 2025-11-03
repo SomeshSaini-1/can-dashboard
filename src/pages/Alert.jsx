@@ -194,9 +194,10 @@ export default function Adddevice() {
       "location": "Location"
     },
     "Geofence": {
-      "motion": "Motion",
+      
+      "location": "Motion",
       "dateTime": "Date-Time",
-      "location": "Location"
+      // "location": "Location"
     },
     "Idling": {
       "idlingDuration": "Idling Time",
@@ -286,7 +287,8 @@ export default function Adddevice() {
               <thead>
                 <tr className="bg-gray-200">
                   <th scope="col" className="border px-3 py-2">Sr.</th>
-                  <th scope="col" className="border px-3 py-2">Device Id</th>
+                  {console.log(Alert)}
+                  {Alert !== "Geofence" ?<th scope="col" className="border px-3 py-2">Device Id</th> :""}
                   {Object.entries(table[Alert]).map(([key, label]) => (
                     <th key={key} scope="col" className="border px-3 py-2">{label}</th>
                   ))}
@@ -300,8 +302,8 @@ export default function Adddevice() {
                   .filter(ele => !deviceId || ele.data?.vehicle === deviceId)
                   .map((ele, index) => (
                     <tr key={index} className="hover:bg-gray-50">
-                      <td className="border px-3 py-2">{index + 1}.</td>
-                      <td className="border px-3 py-2">{ele.data?.vehicle || "N/A"}</td>
+                      <td className="border px-3 py-2">{index + 1}.</td> 
+                      {Alert !== "Geofence" ? <td className="border px-3 py-2">{ele.data?.vehicle || "N/A"}</td>:""}
                       {Object.keys(table[Alert]).map((key) => (
                         <td key={key} className="border px-3 py-2">
                           {(key === "startTime" || key === "endTime" || key === "dateTime")

@@ -1,8 +1,8 @@
-import { MapContainer, TileLayer, Pane, Circle, Polygon } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import customMarkerImage from '../assets/image.png';
-import { useState, useEffect } from 'react';
+import { MapContainer, TileLayer, Pane, Circle, Polygon, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import customMarkerImage from "../assets/image.png";
+import { useState, useEffect } from "react";
 
 delete L.Icon.Default.prototype._getIconUrl;
 
@@ -14,74 +14,87 @@ L.Icon.Default.mergeOptions({
   shadowUrl: null,
 });
 
+// ✅ Helper: keeps map center and zoom updated
+const SetViewOnChange = ({ center, zoom }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (center && zoom) map.setView(center, zoom);
+  }, [center, zoom, map]);
+  return null;
+};
+
 const Map = ({ height = 100, device }) => {
   const [defaultCenter, setDefaultCenter] = useState([26.327573174041746, 94.42290457351207]);
-
   const [geoData, setGeoData] = useState([]);
+  const [zoom, setZoom] = useState(5);
   const apiurl = import.meta.env.VITE_API_URL;
-const [zoom,setzoom] = useState(5)
-
 
   async function fetchData(id) {
-    console.log(id,"device id")
     const url = await fetch(`${apiurl}/Get_geofance`, {
       method: "POST",
       body: JSON.stringify({ name: id || "all" }),
       headers: { "Content-Type": "application/json" },
     });
     const res = await url.json();
-    console.log("API Data:", res);
-    setGeoData(res.map(ele => ele.Data)); // ✅ fixed
+    setGeoData(res.map((ele) => ele.Data));
 
+    if (id && res[0].Data[0].type === "Polygon") {
+      setDefaultCenter([res[0].Data[0].Data[0].lat, res[0].Data[0].Data[0].lng]);
+      setZoom(8);
+    } else if (id && res[0].Data[0].Data.center) {
+      setDefaultCenter([
+        res[0].Data[0].Data.center.lat,
+        res[0].Data[0].Data.center.lng,
+      ]);
+      setZoom(8);
+    }
   }
+
   useEffect(() => {
     fetchData(device);
-    // device && setzoom(15)
   }, [device]);
 
-
-console.log(device,"devide")
-
-
-  useEffect(() => {
-    if (device && geoData.length > 0) {
-      const firstGeo = geoData[0][0];
-      setzoom(10)
-      if (firstGeo.type === "Circle" && firstGeo.Data?.center) {
-        setDefaultCenter([firstGeo.Data.center.lat, firstGeo.Data.center.lng]);
-      } else if (firstGeo.Data && firstGeo.Data.length > 0) {
-        setDefaultCenter(firstGeo.Data[0]);
-      }
-    }
-  }, [device, geoData]);
-  
   return (
-    <div style={{ borderRadius: '0.75rem', overflow: 'hidden', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
+    <div
+      style={{
+        borderRadius: "0.75rem",
+        overflow: "hidden",
+        boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+      }}
+    >
       <MapContainer
         center={defaultCenter}
         zoom={zoom}
-        style={{ height: `${height}vh`, width: '100%' }}
+        style={{ height: `${height}vh`, width: "100%" }}
       >
         <TileLayer
           attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <Pane name="somesh" style={{ zIndex: 9999 }}>
-          
-          {geoData.map((geo, index) => {
-            console.log(geo[0].type, geo)
-            if (geo[0].Data?.center && geo[0].Data?.radius && geo[0].type === "Circle") {
-              return (
+        {/* ✅ Add this inside the MapContainer */}
+        <SetViewOnChange center={defaultCenter} zoom={zoom} />
 
-                <Circle key={index}
-                  center={[geo[0].Data.center?.lat, geo[0].Data.center?.lng]}
+        <Pane name="somesh" style={{ zIndex: 9999 }}>
+          {geoData.map((geo, index) => {
+            if (
+              geo[0].Data?.center &&
+              geo[0].Data?.radius &&
+              geo[0].type === "Circle"
+            ) {
+              return (
+                <Circle
+                  key={index}
+                  center={[geo[0].Data.center.lat, geo[0].Data.center.lng]}
                   radius={geo[0].Data.radius}
-                  pathOptions={{ color: "red", fillColor: "crimson", fillOpacity: .4 }}
-                >
-                </Circle>
+                  pathOptions={{
+                    color: "red",
+                    fillColor: "crimson",
+                    fillOpacity: 0.4,
+                  }}
+                />
               );
-            }else {
+            } else {
               return (
                 <Polygon
                   key={index}
@@ -90,8 +103,6 @@ console.log(device,"devide")
                 />
               );
             }
-
-            return null;
           })}
         </Pane>
       </MapContainer>
