@@ -1,8 +1,7 @@
 
 // pages/Adddevice.jsx (Main Component)
-import { Edit } from "lucide-react";
 import Sidebar from "../components/Nav";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 // import { debounce } from "lodash"; // Ensure lodash is installed: npm install lodash
 
 export default function Adddevice() {

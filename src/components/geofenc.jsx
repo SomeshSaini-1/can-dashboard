@@ -180,6 +180,12 @@ const Geofenc = ({ height = 100, sendDataToParent }) => {
     }
   };
 
+  useEffect(() => {
+  setTimeout(() => {
+    window.dispatchEvent(new Event("resize"));
+  }, 300);
+}, []);
+
   return (
     <div style={{ height: `${height}vh`, width: "100%" }}>
       <MapContainer
@@ -200,7 +206,7 @@ const Geofenc = ({ height = 100, sendDataToParent }) => {
               polygon: { shapeOptions: { color: "blue" }, showArea: true },
               rectangle: false,
               circle: { shapeOptions: { color: "red" } },
-              marker: true,
+              marker: false,
               polyline: false,
               circlemarker: false,
             }}

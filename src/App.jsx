@@ -13,6 +13,7 @@ import Setting from './pages/Setting';
 import Alert_page from './pages/Alert';
 import History from "./pages/history";
 import Geofencing from "./pages/addgeofencing";
+import MapHistory from "./pages/history-map"
 
 // Route protection component
 function ProtectedRoute() {
@@ -63,6 +64,10 @@ function App() {
     {
       path: "/Setting",
       element : <Setting />
+    },
+    {
+      path :"/MapHisroy",
+      element : <MapHistory />
     },
     {
       path :"/Alert",
