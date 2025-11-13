@@ -116,13 +116,13 @@ const Home = () => {
               <span className='flex gap-2 flex items-center  '>
                 {/* <SlidersHorizontal className='h-5' /> */}
                 <select name="data" id="data" className='border rounded p-2' onChange={(e) => setid(e.target.value)}>
-                    <option value={""}>Select the option</option>
+                    <option value={""}>Select the Device</option>
                   {Device_data.map((ele,index) => (
                     <option key={index} value={ele.device_id}>{ele.device_name}</option>
                   ))}
                 </select>
                 <select name="data" id="data" className='border rounded p-2' onChange={(e) => setsensor1(e.target.value)}>
-                    <option value={""}>Select the option</option>
+                    <option value={""}>Select the Sensor</option>
                   {sensor.map((ele,index) => (
                     <option key={index} value={ele}>{ele}</option>
                   ))}

@@ -66,7 +66,7 @@ function App() {
       element : <Setting />
     },
     {
-      path :"/MapHisroy",
+      path :"/MapHistory",
       element : <MapHistory />
     },
     {

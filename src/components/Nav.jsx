@@ -23,13 +23,13 @@ export default function Sidebar() {
   const menu = [
     { name: "Dashboard", icon: <LayoutDashboard size={20} />, link:"/Home" },
     { name: "Devices", icon: <Package size={20} />, link:"/AddDevice" },
-    { name: "Users", icon: <Users size={20} />, link:"/User" },
+    { name: "Drivers", icon: <Users size={20} />, link:"/User" },
     { name: "AddGeofencing", icon: <Radius size={20} />, link:"/AddGeofencing" }
   ];
 
   const deploy = [
     { name: "Map", icon: <Map size={20} />, link:"/Dashboard" },
-    { name: "Alart", icon: <TriangleAlert size={20} />, link:"/Alert" },
+    { name: "Alert", icon: <TriangleAlert size={20} />, link:"/Alert" },
     { name: "History", icon: <ClipboardClock size={20} />, link:"/History" }
   ];
 

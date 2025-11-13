@@ -384,29 +384,6 @@ import { BusFront, Gauge, MapPin, Phone, PhoneCall, User, X } from "lucide-react
 
 export const VehicleContext = createContext();
 
-const vehicles = [
-  {
-    device_id: "08F9E03D1D08",
-    id: "NL 01 AF 9122",
-    status: "PARKED",
-    location: "Hyundai plant, Chennai",
-    lastUpdated: "10 Sep, 4:53 AM",
-    address: "Hyundai plant, Chennai, India",
-    model: "Tata - SIGNA 4025 Tractor Trailer",
-    health: "GOOD",
-  },
-  {
-    device_id: "*860560061081743",
-    id: "NL 01 AH 9334",
-    status: "MOVING",
-    location: "Greenland Mahindra Warehouse",
-    lastUpdated: "10 Sep, 4:37 PM",
-    address: "Greenland Mahindra Warehouse, Nashik",
-    model: "Tata - SIGNA 4025 Tractor Trailer",
-    health: "GOOD",
-  },
-];
-
 const Dashboard = () => {
   const [selected, setSelected] = useState(null);
   const [telemetry, setTelemetry] = useState(null);

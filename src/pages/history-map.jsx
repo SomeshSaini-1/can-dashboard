@@ -1,9 +1,9 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import customMarkerImage from "../assets/image.png";
-import { useState, useCallback, useEffect } from "react";
-import { ArrowLeft, MapPinCheck } from "lucide-react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { ArrowLeft, FastForward, MapPinCheck, Pause, Play, RotateCcw } from "lucide-react";
 import Navbar from "../components/Nav"
 
 
@@ -26,7 +26,7 @@ const directionIcon = (img, angle) =>
 
 const MapHistory = () => {
     const [defaultCenter, setDefaultCenter] = useState([28.624632933245827, 77.20809144517892]);
-    const [positions, setPositions] = useState();
+    const [positions, setPositions] = useState([]);
     const [zoom, setZoom] = useState(5);
     const apiurl = import.meta.env.VITE_API_URL;
 
@@ -41,7 +41,8 @@ const MapHistory = () => {
     const [startdate, setstartdate] = useState(today);
     const [enddate, setenddate] = useState(today);
     const [deviceData, setDeviceData] = useState([]);
-    const [device,setdevice] = useState();
+    const [device, setdevice] = useState();
+    const [Marker1, setMarker1] = useState();
 
     const getValidCoordinates = (lat, long) => {
         if (
@@ -54,24 +55,24 @@ const MapHistory = () => {
             lat === "--" ||
             long === "--"
         ) {
-            return null;
+            return;
         }
-        return [parseFloat(lat), parseFloat(long)];
+        return `${parseFloat(lat)}, ${parseFloat(long)}`;
     };
 
     const historydata = useCallback(async (device_id) => {
         if (!device_id) return;
-        console.log(device_id,'history data')
+        console.log(device_id, 'history data')
         try {
 
             const jsondata = JSON.stringify({
-                        
-            "device_id": device_id,
-            "startdate": startdate,
-            "enddate": enddate,
-            // "page": 1,
-            // "limit": 50
-        
+
+                "device_id": device_id,
+                "startdate": startdate,
+                "enddate": enddate,
+                // "page": 1,
+                // "limit": 50
+
             });
 
             // console.log(jsondata);
@@ -83,32 +84,53 @@ const MapHistory = () => {
             });
 
             const data = await response.json();
-            console.log(data.data,"data");
+            console.log(data.data, "data");
 
-                // setPositions(data.data);
+            // setPositions(data.data);
 
             if (Array.isArray(data.data) && data.data.length > 0) {
-                const newPositions = {};
+                // const newPositions = {};
+                const newPositions = [];
+
                 data.data.forEach((ele) => {
                     const coords = getValidCoordinates(ele.lat, ele.long);
-                    if (device_id !== "all") {
-                        setDefaultCenter(coords)
-                        setZoom(13);
-                    }
-                    console.log(coords);
-                    setPositions(coords)
-                    // if (coords) {
-                    //     if (!newPositions[ele.device_id]) newPositions[ele.device_id] = [];
-                    //     newPositions[ele.device_id].push(coords);
-                    // }
-                });
-                // setPositions(newPositions);
 
+                    // Create and use a Promise properly
+                    const promise = new Promise((resolve, reject) => {
+                        if (coords) {
+                            newPositions.push(coords);
+                            resolve(coords); // success
+                            // setDefaultCenter(coords.split(","))
+                            setZoom(11);
+
+                        } else {
+                            reject("Invalid coordinates");
+                        }
+                    });
+
+                    // Handle the Promise
+                    promise
+                        .then((result) => {
+                            // console.log("✅ Valid coords:", result);
+                        })
+                        .catch((err) => {
+                            // console.error("❌", err);
+                        });
+                });
+                console.log(newPositions, "newPositions")
+                newPositions.reverse().map(ele => {
+                    setPositions(pre => [...pre, ele.split(",")])
+                    // console.log(ele.split(","))
+                })
+                if (newPositions.length > 0) {
+                    setDefaultCenter(newPositions[0]?.split(","));
+                     setMarker1(newPositions[0]?.split(","));
+                }
             }
         } catch (error) {
             console.error("Error fetching map info:", error);
         }
-    }, [apiurl,startdate,enddate]);
+    }, [apiurl, startdate, enddate]);
 
 
 
@@ -117,7 +139,7 @@ const MapHistory = () => {
         try {
             const response = await fetch(`${apiurl}/get_device`, {
                 method: "POST",
-                body: JSON.stringify({ device_id: "all" }),
+                body: JSON.stringify({ device_id: device || "all" }),
                 headers: { "Content-Type": "application/json" },
             });
             if (!response.ok) throw new Error("Failed to fetch devices");
@@ -125,26 +147,53 @@ const MapHistory = () => {
             // console.log(res, 'device data.');
             setDeviceData(res);
         } catch (error) {
-            //   c("Error fetching devices");
             console.error("Error fetching devices:", error);
-        } finally {
-            console.log(false);
         }
     }
 
     useEffect(() => {
-        historydata(device || "all");
+        device && historydata(device);
         fetchDevices()
     }, [device]);
 
 
-    console.log("coords", device, defaultCenter, zoom,positions);
+    // console.log("coords", device, defaultCenter, zoom,positions);
 
     useEffect(() => {
         setTimeout(() => {
             window.dispatchEvent(new Event("resize"));
         }, 300);
     }, []);
+
+
+    const [pause, setpause] = useState(false);
+    const playInterval = useRef(null);
+    const [Time,setTime] = useState(10);
+
+
+    const playdata = () => {
+        if (pause) {
+            clearInterval(playInterval.current)
+            playInterval.current = null;
+            setpause(false)
+            console.log('pause');
+            return;
+        }
+
+        setpause(true);
+        console.log("playing")
+        let index = 0; // start from first position
+        setMarker1(positions[index]);
+        playInterval.current = setInterval(() => {
+            if (index < positions.length) {
+                setMarker1(positions[index]); // update marker position
+                console.log(positions[index], index); // update marker position
+                index++;
+            } else {
+                clearInterval(interval); // stop when done
+            }
+        }, 100 * Time); // update every 5 seconds
+    };
 
 
     return (
@@ -154,7 +203,7 @@ const MapHistory = () => {
                 <div className="p-6 border-b">
                     <div className="flex items-center gap-3 text-lg font-semibold mb-6">
                         <ArrowLeft className="cursor-pointer hover:text-gray-600" />
-                        <span>History of 08923409890823409</span>
+                        <span>History of {device}</span>
                     </div>
 
                     <div className="flex flex-wrap gap-6 items-end">
@@ -193,8 +242,51 @@ const MapHistory = () => {
                     </div>
                 </div>
 
-                <div className="p-6 flex-1">
-                    <div className="rounded-xl overflow-hidden shadow-lg h-[calc(100vh-220px)]">
+                <div className="p-6 flex gap-2">
+
+                 {positions.length > 10 && (
+  <div className="flex flex-col justify-between items-start gap-4 bg-gray-800 text-white p-4 rounded-2xl shadow-md my-3">
+    {/* Controls Section */}
+    <div className="flex items-center gap-3">
+      <button
+        onClick={() => playdata()}
+        className="p-2 bg-blue-600 hover:bg-blue-700 rounded-full transition"
+        title="Play"
+      >
+       {pause ? <Pause className="w-5 h-5"/> : <Play className="w-5 h-5" />}
+      </button>
+
+      <button
+        className="p-2 bg-gray-600 hover:bg-gray-700 rounded-full transition"
+        title="fastforward"
+        onClick={() => setTime(5)}
+      >
+        {/* <RotateCcw  /> */}
+        <FastForward className="w-5 h-5"/>
+      </button>
+
+      <input
+        type="range"
+        min={0}
+        max={positions.length - 1}
+        onChange={(e) => setMarker1(positions[e.target.value])}
+        name="play"
+        id="play"
+        className="w-40 accent-blue-500 cursor-pointer"
+      />
+    </div>
+
+    {/* Device Info Section */}
+    <ul className="text-sm space-y-1">
+      <li><span className="font-semibold">Device Name:</span> {deviceData[0].device_name}</li>
+      <li><span className="font-semibold">Device ID:</span> {deviceData[0].device_id}</li>
+      <li><span className="font-semibold">Mode:</span> {deviceData[0].device_mode}</li>
+      <li><span className="font-semibold">Assigned to:</span> {deviceData[0].Assing_to}</li>
+    </ul>
+  </div>
+)}
+
+                    <div className="flex-1 rounded-xl overflow-hidden shadow-lg h-[calc(100vh-220px)]">
                         <MapContainer
                             center={defaultCenter}
                             zoom={zoom}
@@ -205,26 +297,22 @@ const MapHistory = () => {
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                             />
 
+                            <Polyline
+                                positions={positions}
+                                pathOptions={{ color: "red", weight: 4 }} // customize color and thickness
+                            />
+
                             <SetViewOnChange center={defaultCenter} zoom={zoom} />
-                            {/* {Object.entries(positions).map(([deviceId, coords]) =>
-                                coords.map((pos, idx) => (
-                                    <Marker
-                                        key={`${deviceId}-${idx}`}
-                                        position={pos}
-                                        icon={directionIcon(customMarkerImage, Math.floor(2))}
-                                    >
-                                        <Popup>
-                                            <div className="p-2">
-                                                <h4 className="font-semibold mb-2">Device: {deviceId}</h4>
-                                                <p className="text-sm">Latitude: {pos[0]}</p>
-                                                <p className="text-sm">Longitude: {pos[1]}</p>
-                                            </div>
-                                        </Popup>
-                                    </Marker>
-                                ))
-                            )} */}
+                            {Marker1 && <Marker
+                                position={Marker1}
+                                icon={directionIcon(customMarkerImage, Math.floor(2))}
+                            >
+                              
+                            </Marker>
+                            }
                         </MapContainer>
                     </div>
+
                 </div>
             </section>
         </div>
