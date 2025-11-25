@@ -263,6 +263,9 @@ export default function Adddevice() {
                 <th scope="col" className="border px-3 py-2">
                   Device Id
                 </th>
+                <th scope="col" className="border px-3 py-2">
+                  Location
+                </th>
                 {sensorData[0] &&
                   Object.keys(sensorData[0])
                     .filter((key) => keydata[key])
@@ -287,6 +290,7 @@ export default function Adddevice() {
                   <tr key={index} className="hover:bg-gray-50">
                     <td className="border px-3 py-2">{index + 1}.</td>
                     <td className="border px-3 py-2">{ele.device_id}</td>
+                    <td className="border px-3 py-2">{ele.lat},{ele.long}</td>
                     {sensorData[0] &&
                       Object.keys(sensorData[0])
                         .filter((key) => keydata[key])
@@ -303,7 +307,9 @@ export default function Adddevice() {
           </table>
         </div>
 
-       {sensorData.length > 9 && <div className="flex items-center justify-center gap-4 mt-4">
+       {
+      //  sensorData.length > 9 &&
+        <div className="flex items-center justify-center gap-4 mt-4">
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
             disabled={page === 1}

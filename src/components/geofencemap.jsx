@@ -25,11 +25,11 @@ const SetViewOnChange = ({ center, zoom }) => {
 
 const Map = ({ height = 100, device }) => {
   const [defaultCenter, setDefaultCenter] = useState([26.327573174041746, 94.42290457351207]);
-  const [geoData, setGeoData] = useState([]);
+  
   const [zoom, setZoom] = useState(5);
   const apiurl = import.meta.env.VITE_API_URL;
-
-  async function fetchData(id) {
+  const [geoData, setGeoData] = useState([]);
+  async function geofetchData(id) {
     const url = await fetch(`${apiurl}/Get_geofance`, {
       method: "POST",
       body: JSON.stringify({ name: id || "all" }),
@@ -51,7 +51,7 @@ const Map = ({ height = 100, device }) => {
   }
 
   useEffect(() => {
-    fetchData(device);
+    geofetchData(device);
   }, [device]);
 
   return (
