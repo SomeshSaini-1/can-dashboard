@@ -232,7 +232,7 @@ export default function Adddevice() {
         </div>
 
         {isLoading && <p className="text-blue-500">Loading...</p>}
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="tepmxt-red-500">{error}</p>}
 
         <div className="grid grid-cols-[1fr,1fr,6fr,1fr] gap-4 items-center mb-6">
           <select
@@ -280,9 +280,8 @@ export default function Adddevice() {
           </button>
         </div>
 
-        <div className="overflow-auto">
 
-          <div className="overflow-auto">
+          <div className="overflow-auto h-[26rem]">
             <table className="w-full text-sm text-center border rounded bg-white" id='datatable'>
               <thead>
                 <tr className="bg-gray-200">
@@ -299,7 +298,7 @@ export default function Adddevice() {
               <tbody>
                 
                 {sensorData
-                  .filter(ele => !deviceId || ele.data?.vehicle === deviceId)
+                  .filter(ele => !deviceId || ele.data?.vehicle === deviceId || ele.data?.location.includes(deviceId))
                   .map((ele, index) => (
                     <tr key={index} className="hover:bg-gray-50">
                       <td className="border px-3 py-2">{index + 1}.</td> 
@@ -321,9 +320,11 @@ export default function Adddevice() {
                 </tbody>
                 </table>
                 </div>
-        </div>
+        
 
-        {sensorData.length > 9 && <div className="flex items-center justify-center gap-4 mt-4">
+        {
+        // sensorData.length > 9 &&
+         <div className="flex items-center justify-center gap-4 mt-4">
           <button
             onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
             disabled={page === 1}

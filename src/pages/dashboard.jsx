@@ -574,7 +574,8 @@ const Dashboard = () => {
               </p>
             </div>
 
-            {/* Sensor Values */ console.log(telemetry, 'telemetry')}
+            {/* Sensor Values */}
+            {/* console.log(telemetry, 'telemetry') */}
             {telemetry ? (
               <div className="mt-6">
                 <h3 className="text-lg font-semibold text-gray-600 mb-3">
@@ -663,7 +664,7 @@ const Dashboard = () => {
         )}
 
         <div className="flex-1">
-           <MapComponent device={selected?.device_id} />
+           <MapComponent device={selected?.device_id} data_seletected={telemetry}/>
         </div>
 
       </div>

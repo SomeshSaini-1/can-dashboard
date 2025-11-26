@@ -3,10 +3,10 @@ import Map from '../components/geofencemap'
 import Navbar from '../components/Nav'
 import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { CircleX, Edit, Plus, ScanSearch, Trash, View } from 'lucide-react'
+import { CircleX, Edit, Plus, ScanSearch, Trash } from 'lucide-react'
 import Geofenc from '../components/geofenc';
+import { ToastContainer, toast } from 'react-toastify';
 
-  import { ToastContainer, toast } from 'react-toastify';
 
 const Addgeofance = () => {
   const navigate = useNavigate();
@@ -63,6 +63,13 @@ const Addgeofance = () => {
       notify("Please select a point on the map.");
       return;
     }
+    console.log(pointdata.type , device.Type)
+    if(pointdata.type !== device.Type){
+      notify("Please change the Type.");
+      return;
+    }
+
+
     let data = JSON.stringify({
         Name: device.Name,
         Type: device.Type,
@@ -89,6 +96,7 @@ const Addgeofance = () => {
     const result = await response.json();
     console.log(result);
     setGeo(false);
+    setpointdata(null);
     notify("Data inserted.");
     fetchData();
     setDevice({
@@ -136,7 +144,7 @@ const Addgeofance = () => {
   return (
     <div className='flex'>
       <Navbar />
-      <ToastContainer />
+      <ToastContainer style={{zIndex : 99999}} />
 
 
       {Geo && (
