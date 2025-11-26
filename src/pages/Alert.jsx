@@ -107,6 +107,8 @@ export default function Adddevice() {
       setIsLoading(false);
     }
   }
+
+
   const exportData = () => {
     if (sensorData.length === 0) {
       alert('No data to export');
@@ -133,7 +135,6 @@ export default function Adddevice() {
     }
   };
 
-
   // const exportData = () => {
   //   const headers = Object.keys(keydata).filter((key) => sensorData[0]?.[key]);
   //   const csvContent = [
@@ -152,12 +153,11 @@ export default function Adddevice() {
   //   window.URL.revokeObjectURL(url);
   // };
 
-
   useEffect(() => {
     fetchDevices();
   }, []);
-  
-  
+
+
   useEffect(() => {
     all_data();
   }, [deviceId, Alert, page, limit]);
@@ -168,22 +168,22 @@ export default function Adddevice() {
       "overSpeed": "over Speed",
       "duration": "Duration",
       "distanceTravelled": "Distance Travlled",
-      "dateTime":"Date-Time",
+      "dateTime": "Date-Time",
       "location": "Location"
     },
     "HarshAcceleration": {
 
-      "dateTime":"Date-Time",
+      "dateTime": "Date-Time",
       "location": "Location"
     },
     "HardBrake": {
 
-      "dateTime":"Date-Time",
+      "dateTime": "Date-Time",
       "location": "Location"
     },
     "Stoppage": {
       "Stoppagetime": "Stoppage Time",
-      "dateTime":"Date-Time",
+      "dateTime": "Date-Time",
       "location": "Location"
     },
     "Freerun": {
@@ -194,7 +194,7 @@ export default function Adddevice() {
       "location": "Location"
     },
     "Geofence": {
-      
+
       "location": "Motion",
       "dateTime": "Date-Time",
       // "location": "Location"
@@ -204,7 +204,7 @@ export default function Adddevice() {
       // "Fuel_consumed": "Fuel Consumed",
       "Ambient_Temperature": "Ambient Temperature",
       "startTime": "From",
-      "endTime":"To",
+      "endTime": "To",
       "location": "Location"
     }
   }
@@ -281,65 +281,65 @@ export default function Adddevice() {
         </div>
 
 
-          <div className="overflow-auto h-[26rem]">
-            <table className="w-full text-sm text-center border rounded bg-white" id='datatable'>
-              <thead>
-                <tr className="bg-gray-200">
-                  <th scope="col" className="border px-3 py-2">Sr.</th>
-                  {console.log(Alert)}
-                  {Alert !== "Geofence" ?<th scope="col" className="border px-3 py-2">Device Id</th> :""}
-                  {Object.entries(table[Alert]).map(([key, label]) => (
-                    <th key={key} scope="col" className="border px-3 py-2">{label}</th>
-                  ))}
+        <div className="overflow-auto h-[26rem]">
+          <table className="w-full text-sm text-center border rounded bg-white" id='datatable'>
+            <thead>
+              <tr className="bg-gray-200">
+                <th scope="col" className="border px-3 py-2">Sr.</th>
+                {console.log(Alert)}
+                {Alert !== "Geofence" ? <th scope="col" className="border px-3 py-2">Device Id</th> : ""}
+                {Object.entries(table[Alert]).map(([key, label]) => (
+                  <th key={key} scope="col" className="border px-3 py-2">{label}</th>
+                ))}
 
-                  {/* <th scope="col" className="border px-3 py-2">Date-Time</th>    */}
-                </tr>
-              </thead>
-              <tbody>
-                
-                {sensorData
-                  .filter(ele => !deviceId || ele.data?.vehicle === deviceId || ele.data?.location.includes(deviceId))
-                  .map((ele, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="border px-3 py-2">{index + 1}.</td> 
-                      {Alert !== "Geofence" ? <td className="border px-3 py-2">{ele.data?.vehicle || "N/A"}</td>:""}
-                      {Object.keys(table[Alert]).map((key) => (
-                        <td key={key} className="border px-3 py-2">
-                          {(key === "startTime" || key === "endTime" || key === "dateTime")
-                            ? (ele.data?.[key] ? convertUTCtoIST(ele.data?.[key]) : "N/A")
-                            : (ele.data?.[key] ?? "N/A")}
-                        </td>
-                      ))}
-                      {/* {Alert !== "idling" && (
+                {/* <th scope="col" className="border px-3 py-2">Date-Time</th>    */}
+              </tr>
+            </thead>
+            <tbody>
+
+              {sensorData
+                .filter(ele => !deviceId || ele.data?.vehicle === deviceId || ele.data?.location.includes(deviceId))
+                .map((ele, index) => (
+                  <tr key={index} className="hover:bg-gray-50">
+                    <td className="border px-3 py-2">{index + 1}.</td>
+                    {Alert !== "Geofence" ? <td className="border px-3 py-2">{ele.data?.vehicle || "N/A"}</td> : ""}
+                    {Object.keys(table[Alert]).map((key) => (
+                      <td key={key} className="border px-3 py-2">
+                        {(key === "startTime" || key === "endTime" || key === "dateTime")
+                          ? (ele.data?.[key] ? convertUTCtoIST(ele.data?.[key]) : "N/A")
+                          : (ele.data?.[key] ?? "N/A")}
+                      </td>
+                    ))}
+                    {/* {Alert !== "idling" && (
                         <td className="border px-3 py-2">
                           {convertUTCtoIST(ele.data?.dateTime) ?? "N/A"}
                         </td>
                       )} */}
-                    </tr>
-                  ))}
-                </tbody>
-                </table>
-                </div>
-        
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+
 
         {
-        // sensorData.length > 9 &&
-         <div className="flex items-center justify-center gap-4 mt-4">
-          <button
-            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-            disabled={page === 1}
-            className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
-          >
-            Previous
-          </button>
-          {page}
-          <button
-            onClick={() => setPage((prev) => prev + 1)}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
-          >
-            Next
-          </button>
-        </div>}
+          // sensorData.length > 9 &&
+          <div className="flex items-center justify-center gap-4 mt-4">
+            <button
+              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              disabled={page === 1}
+              className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-300"
+            >
+              Previous
+            </button>
+            {page}
+            <button
+              onClick={() => setPage((prev) => prev + 1)}
+              className="px-4 py-2 bg-blue-500 text-white rounded"
+            >
+              Next
+            </button>
+          </div>}
       </div>
     </div>
   );

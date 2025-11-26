@@ -3,7 +3,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import customMarkerImage from "../assets/image.png";
 import { useState, useCallback, useEffect, useRef } from "react";
-import { ArrowLeft, FastForward, MapPinCheck, Pause, Play, RotateCcw } from "lucide-react";
+import { ArrowLeft, FastForward, LoaderCircle, MapPinCheck, Pause, Play, RotateCcw } from "lucide-react";
 import Navbar from "../components/Nav"
 
 
@@ -43,6 +43,7 @@ const MapHistory = () => {
     const [deviceData, setDeviceData] = useState([]);
     const [device, setdevice] = useState();
     const [Marker1, setMarker1] = useState();
+    const [loading,setloading] = useState(false);
 
     const getValidCoordinates = (lat, long) => {
         if (
@@ -62,7 +63,8 @@ const MapHistory = () => {
 
     const historydata = useCallback(async (device_id) => {
         if (!device_id) return;
-        console.log(device_id, 'history data')
+        console.log(device_id, 'history data');
+        setloading(true);
         try {
 
             const jsondata = JSON.stringify({
@@ -124,8 +126,9 @@ const MapHistory = () => {
                 })
                 if (newPositions.length > 0) {
                     setDefaultCenter(newPositions[0]?.split(","));
-                     setMarker1(newPositions[0]?.split(","));
+                    setMarker1(newPositions[0]?.split(","));
                 }
+                setloading(false);
             }
         } catch (error) {
             console.error("Error fetching map info:", error);
@@ -168,7 +171,7 @@ const MapHistory = () => {
 
     const [pause, setpause] = useState(false);
     const playInterval = useRef(null);
-    const [Time,setTime] = useState(10);
+    const [Time, setTime] = useState(10);
 
 
     const playdata = () => {
@@ -244,49 +247,49 @@ const MapHistory = () => {
 
                 <div className="p-6 flex gap-2">
 
-                 {positions.length > 10 && (
-  <div className="flex flex-col justify-between items-start gap-4 bg-gray-800 text-white p-4 rounded-2xl shadow-md my-3">
-    {/* Controls Section */}
-    <div className="flex items-center gap-3">
-      <button
-        onClick={() => playdata()}
-        className="p-2 bg-blue-600 hover:bg-blue-700 rounded-full transition"
-        title="Play"
-      >
-       {pause ? <Pause className="w-5 h-5"/> : <Play className="w-5 h-5" />}
-      </button>
+                    {positions.length > 10 && (
+                        <div className="flex flex-col justify-between items-start gap-4 bg-gray-800 text-white p-4 rounded-2xl shadow-md my-3">
+                            {/* Controls Section */}
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={() => playdata()}
+                                    className="p-2 bg-blue-600 hover:bg-blue-700 rounded-full transition"
+                                    title="Play"
+                                >
+                                    {pause ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                                </button>
 
-      <button
-        className="p-2 bg-gray-600 hover:bg-gray-700 rounded-full transition"
-        title="fastforward"
-        onClick={() => setTime(5)}
-      >
-        {/* <RotateCcw  /> */}
-        <FastForward className="w-5 h-5"/>
-      </button>
+                                <button
+                                    className="p-2 bg-gray-600 hover:bg-gray-700 rounded-full transition"
+                                    title="fastforward"
+                                    onClick={() => setTime(5)}
+                                >
+                                    {/* <RotateCcw  /> */}
+                                    <FastForward className="w-5 h-5" />
+                                </button>
 
-      <input
-        type="range"
-        min={0}
-        max={positions.length - 1}
-        onChange={(e) => setMarker1(positions[e.target.value])}
-        name="play"
-        id="play"
-        className="w-40 accent-blue-500 cursor-pointer"
-      />
-    </div>
+                                <input
+                                    type="range"
+                                    min={0}
+                                    max={positions.length - 1}
+                                    onChange={(e) => setMarker1(positions[e.target.value])}
+                                    name="play"
+                                    id="play"
+                                    className="w-40 accent-blue-500 cursor-pointer"
+                                />
+                            </div>
 
-    {/* Device Info Section */}
-    <ul className="text-sm space-y-1">
-      <li><span className="font-semibold">Device Name:</span> {deviceData[0].device_name}</li>
-      <li><span className="font-semibold">Device ID:</span> {deviceData[0].device_id}</li>
-      <li><span className="font-semibold">Mode:</span> {deviceData[0].device_mode}</li>
-      <li><span className="font-semibold">Assigned to:</span> {deviceData[0].Assing_to}</li>
-    </ul>
-  </div>
-)}
+                            {/* Device Info Section */}
+                            <ul className="text-sm space-y-1">
+                                <li><span className="font-semibold">Device Name:</span> {deviceData[0].device_name}</li>
+                                <li><span className="font-semibold">Device ID:</span> {deviceData[0].device_id}</li>
+                                <li><span className="font-semibold">Mode:</span> {deviceData[0].device_mode}</li>
+                                <li><span className="font-semibold">Assigned to:</span> {deviceData[0].Assing_to}</li>
+                            </ul>
+                        </div>
+                    )}
 
-                    <div className="flex-1 rounded-xl overflow-hidden shadow-lg h-[calc(100vh-220px)]">
+                    {!loading  ? <div className="flex-1 rounded-xl overflow-hidden shadow-lg h-[calc(100vh-220px)]">
                         <MapContainer
                             center={defaultCenter}
                             zoom={zoom}
@@ -307,11 +310,11 @@ const MapHistory = () => {
                                 position={Marker1}
                                 icon={directionIcon(customMarkerImage, Math.floor(2))}
                             >
-                              
+
                             </Marker>
                             }
                         </MapContainer>
-                    </div>
+                    </div> : <> <LoaderCircle size={32} strokeWidth={1.75} absoluteStrokeWidth className="animate-spin slow-spin"/></>}
 
                 </div>
             </section>

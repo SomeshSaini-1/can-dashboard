@@ -30,7 +30,8 @@ export default function Sidebar() {
   const deploy = [
     { name: "Map", icon: <Map size={20} />, link:"/Dashboard" },
     { name: "Alert", icon: <TriangleAlert size={20} />, link:"/Alert" },
-    { name: "History", icon: <ClipboardClock size={20} />, link:"/History" }
+    // { name: "History", icon: <ClipboardClock size={20} />, link:"/History" }
+    { name: "History", icon: <ClipboardClock size={20} />, link:"/MapHistory" }
   ];
 
   const others = [
