@@ -254,7 +254,7 @@ const Addgeofance = () => {
         </div>
 
 
-        <section className='mb-6 grid gap-4 grid-cols-[1fr,2fr]'>
+        <section className='mb-6 grid gap-4 grid-cols-1 md:grid-cols-[1fr,2fr] '>
 
           <div className='flex-1 overflow-auto border'>
             {/* <div className='text-xl text-gray-500 p-2 '>Total Devices ({Device_data.length}) </div> */}

@@ -23,7 +23,7 @@ const directionIcon = (img, angle) =>
   });
 
 const Map = ({ height = 100, device, data_seletected }) => {
-  console.log(data_seletected, "map component");
+  // console.log(data_seletected, "map component");
 
   const [defaultCenter, setDefaultCenter] = useState([26.327573174041746, 94.42290457351207]);
   const [positions, setPositions] = useState({});
@@ -67,11 +67,13 @@ const Map = ({ height = 100, device, data_seletected }) => {
         setPositions(newPositions);
 
         if (device_id !== "all" && updatedCenter) {
+          console.log(updatedCenter,"map center",newPositions);
           setDefaultCenter(updatedCenter);
           setZoom(15);
         } else if (device_id === "all") {
           const allCoords = Object.values(newPositions).flat();
           if (allCoords.length > 0) {
+            // console.log(allCoords,"all coords");
             setDefaultCenter(allCoords[0]);
             setZoom(8);
           }

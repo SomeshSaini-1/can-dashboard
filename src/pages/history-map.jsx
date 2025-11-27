@@ -43,7 +43,7 @@ const MapHistory = () => {
     const [deviceData, setDeviceData] = useState([]);
     const [device, setdevice] = useState();
     const [Marker1, setMarker1] = useState();
-    const [loading,setloading] = useState(false);
+    const [loading, setloading] = useState(false);
 
     const getValidCoordinates = (lat, long) => {
         if (
@@ -54,7 +54,7 @@ const MapHistory = () => {
             lat === undefined ||
             long === undefined ||
             lat === "--" ||
-            long === "--" || 
+            long === "--" ||
             lat === "0" ||
             long === "0"
         ) {
@@ -99,7 +99,7 @@ const MapHistory = () => {
                 data.data.forEach((ele) => {
 
                     const coords = getValidCoordinates(ele.lat, ele.long);
-                    
+
                     // Create and use a Promise properly
                     const promise = new Promise((resolve, reject) => {
                         if (coords) {
@@ -122,12 +122,12 @@ const MapHistory = () => {
                             // console.error("❌", err);
                         });
                 });
-                
-                const uniqueArray = [...new Set(newPositions)]; 
+
+                const uniqueArray = [...new Set(newPositions)];
 
                 console.log(uniqueArray, "newPositions");
                 uniqueArray.reverse().map(ele => {
-                    if(ele.split(',')[0] === "0" ) return ;
+                    if (ele.split(',')[0] === "0") return;
                     // console.log(ele);
                     setPositions(pre => [...pre, ele.split(",")])
                     // console.log(ele.split(","))
@@ -253,78 +253,81 @@ const MapHistory = () => {
                     </div>
                 </div>
 
-                <div className="p-6 flex gap-2">
+                {!loading ?
 
-                    {positions.length > 10 && (
-                        <div className="flex flex-col justify-between items-start gap-4 bg-gray-800 text-white p-4 rounded-2xl shadow-md my-3">
-                            {/* Controls Section */}
-                            <div className="flex items-center gap-3">
-                                <button
-                                    onClick={() => playdata()}
-                                    className="p-2 bg-blue-600 hover:bg-blue-700 rounded-full transition"
-                                    title="Play"
-                                >
-                                    {pause ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-                                </button>
+                    <div className="p-6 flex gap-2">
 
-                                <button
-                                    className="p-2 bg-gray-600 hover:bg-gray-700 rounded-full transition"
-                                    title="fastforward"
-                                    onClick={() => setTime(5)}
-                                >
-                                    {/* <RotateCcw  /> */}
-                                    <FastForward className="w-5 h-5" />
-                                </button>
+                        {positions.length > 10 && (
+                            <div className="flex flex-col justify-between items-start gap-4 bg-gray-800 text-white p-4 rounded-2xl shadow-md my-3">
+                                {/* Controls Section */}
+                                <div className="flex items-center gap-3">
+                                    <button
+                                        onClick={() => playdata()}
+                                        className="p-2 bg-blue-600 hover:bg-blue-700 rounded-full transition"
+                                        title="Play"
+                                    >
+                                        {pause ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+                                    </button>
 
-                                <input
-                                    type="range"
-                                    min={0}
-                                    max={positions.length - 1}
-                                    onChange={(e) => setMarker1(positions[e.target.value])}
-                                    name="play"
-                                    id="play"
-                                    className="w-40 accent-blue-500 cursor-pointer"
-                                />
+                                    <button
+                                        className="p-2 bg-gray-600 hover:bg-gray-700 rounded-full transition"
+                                        title="fastforward"
+                                        onClick={() => setTime(5)}
+                                    >
+                                        {/* <RotateCcw  /> */}
+                                        <FastForward className="w-5 h-5" />
+                                    </button>
+
+                                    <input
+                                        type="range"
+                                        min={0}
+                                        max={positions.length - 1}
+                                        onChange={(e) => setMarker1(positions[e.target.value])}
+                                        name="play"
+                                        id="play"
+                                        className="w-40 accent-blue-500 cursor-pointer"
+                                    />
+                                </div>
+
+                                {/* Device Info Section */}
+                                <ul className="text-sm space-y-1">
+                                    <li><span className="font-semibold">Device Name:</span> {deviceData[0].device_name}</li>
+                                    <li><span className="font-semibold">Device ID:</span> {deviceData[0].device_id}</li>
+                                    <li><span className="font-semibold">Mode:</span> {deviceData[0].device_mode}</li>
+                                    <li><span className="font-semibold">Assigned to:</span> {deviceData[0].Assing_to}</li>
+                                </ul>
                             </div>
+                        )}
 
-                            {/* Device Info Section */}
-                            <ul className="text-sm space-y-1">
-                                <li><span className="font-semibold">Device Name:</span> {deviceData[0].device_name}</li>
-                                <li><span className="font-semibold">Device ID:</span> {deviceData[0].device_id}</li>
-                                <li><span className="font-semibold">Mode:</span> {deviceData[0].device_mode}</li>
-                                <li><span className="font-semibold">Assigned to:</span> {deviceData[0].Assing_to}</li>
-                            </ul>
-                        </div>
-                    )}
-
-                    {!loading  ? <div className="flex-1 rounded-xl overflow-hidden shadow-lg h-[calc(100vh-220px)]">
-                        <MapContainer
-                            center={defaultCenter}
-                            zoom={zoom}
-                            style={{ height: "100%", width: "100%" }}
-                        >
-                            <TileLayer
-                                attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
-                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            />
-
-                            <Polyline
-                                positions={positions}
-                                pathOptions={{ color: "red", weight: 4 }} // customize color and thickness
-                            />
-
-                            <SetViewOnChange center={defaultCenter} zoom={zoom} />
-                            {Marker1 && <Marker
-                                position={Marker1}
-                                icon={directionIcon(customMarkerImage, Math.floor(2))}
+                        <div className="flex-1 rounded-xl overflow-hidden shadow-lg h-[calc(100vh-220px)]">
+                            <MapContainer
+                                center={defaultCenter}
+                                zoom={zoom}
+                                style={{ height: "100%", width: "100%" }}
                             >
+                                <TileLayer
+                                    attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                />
 
-                            </Marker>
-                            }
-                        </MapContainer>
-                    </div> : <> <LoaderCircle size={32} strokeWidth={1.75} absoluteStrokeWidth className="animate-spin slow-spin"/></>}
+                                <Polyline
+                                    positions={positions}
+                                    pathOptions={{ color: "red", weight: 4 }} // customize color and thickness
+                                />
 
-                </div>
+                                <SetViewOnChange center={defaultCenter} zoom={zoom} />
+                                {Marker1 && 
+                                <Marker position={Marker1}
+                                  icon={directionIcon(customMarkerImage, Math.floor(2))}>
+                                </Marker>
+                                }
+                            </MapContainer>
+                        </div>
+
+                    </div>
+
+                    : <> <LoaderCircle size={32} strokeWidth={1.75} absoluteStrokeWidth className="animate-spin slow-spin" /></>}
+
             </section>
         </div>
     );

@@ -504,19 +504,21 @@ const Dashboard = () => {
               setSelected(v);
               setTelemetry(null);
             }}
-            className={`relative p-3 border mb-2 cursor-pointer rounded ${selected?.device_id === v.device_id ? "bg-blue-100" : "hover:bg-gray-50"
+            className={`relative p-3 border mb-2 cursor-pointer rounded
+               ${selected?.device_id === v.device_id ? "bg-blue-100" : "hover:bg-gray-50"
               }`}
           >
             <div
-              className={`absolute top-0 left-0 h-full w-5 flex items-center justify-center rounded-l ${v.status === "Connected" ? "bg-green-500" : "bg-red-500"
+              className={`absolute top-0 left-0 h-full w-5 flex items-center justify-center rounded-l 
+                ${v.status === "Connected" ? "bg-green-500" : "bg-red-500"
                 }`}
             >
               <span className="text-white text-[10px] font-bold -rotate-90">
-                {v.status || "Disconnect"}
+                {v.status || "Disconnect"}/
               </span>
             </div>
             <div className="pl-6">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center flex-wrap">
                 <span className="font-semibold">
                   {v.device_id}
 
@@ -756,6 +758,19 @@ function SpeedBox({ device_id }) {
       </div>
     </div>
   );
+//   return (
+//   <div className="w-[8rem] h-[5rem] sm:w-[10rem] sm:h-[6rem] md:w-[12rem] md:h-[7rem] flex flex-col items-center justify-center bg-gray-200 py-4 shadow-md rounded-2xl">
+//     <span
+//       className={`px-2 text-sm sm:text-base font-semibold border rounded-full mb-2 ${
+//         speed > 0 ? 'text-green-500 border-green-500' : 'text-red-500 border-red-500'
+//       }`}
+//     >
+//       {speed > 0 ? 'Positive Speed' : 'Negative Speed'}
+//     </span>
+//     <p className="text-xs sm:text-sm text-gray-600">Speed: {speed}</p>
+//   </div>
+// );
+
 }
 
 

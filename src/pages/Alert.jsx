@@ -659,7 +659,7 @@ export default function Adddevice() {
         {isLoading && <p className="text-blue-500">Loading...</p>}
         {error && <p className="text-red-500">{error}</p>}
 
-        <div className="grid grid-cols-[1fr,1fr,6fr,1fr] gap-4 items-center mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,6fr,1fr] gap-4 items-center mb-6">
           <select
             value={limit}
             onChange={(e) => setlimit(e.target.value)}

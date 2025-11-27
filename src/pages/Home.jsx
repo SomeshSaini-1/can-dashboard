@@ -111,7 +111,7 @@ const Home = () => {
 
         <section className='mb-6'>
           <div className='mb-6'>
-            <div className=' font-semibold flex items-center justify-between mb-6'>
+            <div className=' font-semibold flex items-center flex-wrap justify-between mb-6'>
               Chart
               <span className='flex gap-2 flex items-center  '>
                 {/* <SlidersHorizontal className='h-5' /> */}
