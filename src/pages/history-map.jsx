@@ -54,7 +54,9 @@ const MapHistory = () => {
             lat === undefined ||
             long === undefined ||
             lat === "--" ||
-            long === "--"
+            long === "--" || 
+            lat === "0" ||
+            long === "0"
         ) {
             return;
         }
@@ -95,8 +97,9 @@ const MapHistory = () => {
                 const newPositions = [];
 
                 data.data.forEach((ele) => {
-                    const coords = getValidCoordinates(ele.lat, ele.long);
 
+                    const coords = getValidCoordinates(ele.lat, ele.long);
+                    
                     // Create and use a Promise properly
                     const promise = new Promise((resolve, reject) => {
                         if (coords) {
@@ -119,8 +122,13 @@ const MapHistory = () => {
                             // console.error("❌", err);
                         });
                 });
-                console.log(newPositions, "newPositions")
-                newPositions.reverse().map(ele => {
+                
+                const uniqueArray = [...new Set(newPositions)]; 
+
+                console.log(uniqueArray, "newPositions");
+                uniqueArray.reverse().map(ele => {
+                    if(ele.split(',')[0] === "0" ) return ;
+                    // console.log(ele);
                     setPositions(pre => [...pre, ele.split(",")])
                     // console.log(ele.split(","))
                 })
