@@ -56,7 +56,9 @@ const MapHistory = () => {
             lat === "--" ||
             long === "--" ||
             lat === "0" ||
-            long === "0"
+            long === "0" ||
+            lat === 0 ||
+            long === 0
         ) {
             return;
         }
@@ -129,13 +131,19 @@ const MapHistory = () => {
                 uniqueArray.reverse().map(ele => {
                     if (ele.split(',')[0] === "0") return;
                     // console.log(ele);
-                    setPositions(pre => [...pre, ele.split(",")])
+                    setPositions(pre => [...pre, ele.split(",")]);
                     // console.log(ele.split(","))
-                })
-                if (newPositions.length > 0) {
-                    setDefaultCenter(newPositions[0]?.split(","));
-                    setMarker1(newPositions[0]?.split(","));
+                });
+
+                
+                    console.log(uniqueArray[0]?.split(","));
+                if (uniqueArray.length > 0) {
+                    if(uniqueArray[0]?.split(",")[0] !== "0") {
+                     
+                    setDefaultCenter(uniqueArray[0]?.split(","));
+                    setMarker1(uniqueArray[0]?.split(","));
                 }
+            }
                 setloading(false);
             }
         } catch (error) {
@@ -190,18 +198,23 @@ const MapHistory = () => {
             console.log('pause');
             return;
         }
-
+        setPositions([])
         setpause(true);
         console.log("playing")
         let index = 0; // start from first position
         setMarker1(positions[index]);
         playInterval.current = setInterval(() => {
             if (index < positions.length) {
-                setMarker1(positions[index]); // update marker position
-                console.log(positions[index], index); // update marker position
+                console.log(positions[index][0])
+                if(positions[index][0] !== "0") {
+                    setMarker1((positions[index])); // update marker position
+                        // setPositions(pre => [...pre, ele.split(",")]);
+                    setPositions(pre => [...pre,positions[index]])
+                    console.log(positions[index], index); // update marker position
+                }
                 index++;
             } else {
-                clearInterval(interval); // stop when done
+                clearInterval(playInterval.current); // stop when done
             }
         }, 100 * Time); // update every 5 seconds
     };

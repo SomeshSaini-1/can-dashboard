@@ -550,7 +550,7 @@ export default function Adddevice() {
     console.log((num - 1),num,num % 2 );
 
   if(num % 2 === 0){
-    count = num ;
+    count = num / 2;
   }else{
     console.log("odd" , (num - 1) / 2)
     count = (num - 1) / 2;
@@ -665,9 +665,9 @@ export default function Adddevice() {
             onChange={(e) => setlimit(e.target.value)}
             className="border-2 border-gray-200 p-2 rounded"
           >
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="30">30</option>
+            <option value="100">100</option>
+            <option value="200">200</option>
+            <option value="300">300</option>
           </select>
 
           <select
@@ -759,6 +759,7 @@ export default function Adddevice() {
 
           <button
             onClick={() => setPage((p) => p + 1)}
+            disabled={sensorData.length === 0}
             className="px-4 py-2 bg-blue-500 text-white rounded"
           >
             Next
