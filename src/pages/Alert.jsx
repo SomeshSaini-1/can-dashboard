@@ -383,7 +383,7 @@ export default function Adddevice() {
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [limit, setlimit] = useState(10);
+  const [limit, setlimit] = useState(20);
   const [collapsed, setCollapsed] = useState(false);
 
   const [geofenceCount, setGeofenceCount] = useState(0); // NEW STATE
@@ -659,16 +659,16 @@ export default function Adddevice() {
         {isLoading && <p className="text-blue-500">Loading...</p>}
         {error && <p className="text-red-500">{error}</p>}
 
-        <div className="grid grid-cols-1 md:grid-cols-[1fr,1fr,6fr,1fr] gap-4 items-center mb-6">
-          <select
+        <div className="grid grid-cols-1 md:grid-cols-[1fr,6fr,1fr] gap-4 items-center mb-6">
+          {/* <select
             value={limit}
             onChange={(e) => setlimit(e.target.value)}
             className="border-2 border-gray-200 p-2 rounded"
           >
-            <option value="100">100</option>
-            <option value="200">200</option>
-            <option value="300">300</option>
-          </select>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+          </select> */}
 
           <select
             value={deviceId}

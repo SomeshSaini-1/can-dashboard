@@ -1,4 +1,4 @@
-import { CircleX, Delete, DeleteIcon, Edit, Filter, Plus, Search, Trash2 } from "lucide-react";
+import { CircleX, Edit, Plus, Trash2 } from "lucide-react";
 import Sidebar from "../components/Nav";
 import { useEffect, useState } from "react";
 
