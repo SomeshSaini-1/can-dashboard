@@ -1,11 +1,24 @@
-import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  Polyline,
+} from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import customMarkerImage from "../assets/image.png";
 import { useState, useCallback, useEffect, useRef } from "react";
-import { ArrowLeft, FastForward, LoaderCircle, Pause, Play } from "lucide-react";
+import {
+  ArrowLeft,
+  FastForward,
+  LoaderCircle,
+  Pause,
+  Play,
+} from "lucide-react";
 import Navbar from "../components/Nav";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast } from "react-toastify";
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -29,11 +42,13 @@ const MapHistory = () => {
 
   // const [defaultCenter, setDefaultCenter] = useState([28.6246, 77.2080]);
   // const [zoom, setZoom] = useState(6);
-  
-    const notify = (data) => toast(data);
-    const [defaultCenter, setDefaultCenter] = useState([28.624632933245827, 77.20809144517892]);
-    const [zoom, setZoom] = useState(5);
-  const [positions, setPositions] = useState({}); 
+
+  const notify = (data) => toast(data);
+  const [defaultCenter, setDefaultCenter] = useState([
+    28.624632933245827, 77.20809144517892,
+  ]);
+  const [zoom, setZoom] = useState(5);
+  const [positions, setPositions] = useState({});
   const [liveMarkers, setLiveMarkers] = useState({});
   const [deviceData, setDeviceData] = useState([]);
   const [device, setdevice] = useState([]);
@@ -54,10 +69,10 @@ const MapHistory = () => {
   const [enddate, setenddate] = useState(today);
 
   const getValidCoordinates = (lat, long) => {
-    if (!lat || !long || lat == 0 || long == 0 || lat === "NA" || long === "NA") return null;
+    if (!lat || !long || lat == 0 || long == 0 || lat === "NA" || long === "NA")
+      return null;
     return [parseFloat(lat), parseFloat(long)];
   };
-
 
   async function fetchDevices() {
     try {
@@ -73,102 +88,159 @@ const MapHistory = () => {
     }
   }
 
-  const historydata = useCallback(async (device_id) => {
-    if (!device_id?.length) return;
+  const historydata = useCallback(
+    async (device_id) => {
+      if (!device_id?.length) return;
 
-    setloading(true);
+      setloading(true);
 
-    const response = await fetch(`${apiurl}/MultipleDeviceHistory`, {
-      method: "POST",
-      body: JSON.stringify({ device_id, startdate, enddate }),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    const data = await response.json();
-    if (!data?.data?.length) return setloading(false);
-
-    const grouped = {};
-
-    data.data.forEach((ele) => {
-      const coords = getValidCoordinates(ele.lat, ele.long);
-      if (!coords) return;
-
-      if (!grouped[ele.device_id]) grouped[ele.device_id] = [];
-      grouped[ele.device_id].push(coords);
-    });
-
-    console.log(grouped);
-    setPositions(grouped);
-
-    const firstKey = Object.keys(grouped)[0];
-    if (firstKey) {
-      setDefaultCenter(grouped[firstKey][0]);
-      setZoom(12);
-    }
-
-    setloading(false);
-  }, [apiurl, startdate, enddate]);
-
-
-  useEffect(() => {
-    console.log(positions,"positions",device)
-  // if (!positions?.length || !device?.length) return;
-  const firstPoints = {};
-
-  // positions.forEach((ele) => {
-  //   if (device.includes(ele.device_id) && !firstPoints[ele.device_id]) {
-  //     firstPoints[ele.device_id] = ele.coords.split(",").map(Number);
-  //   }
-  // });
-
-    Object.keys(positions).forEach((devId) => {
-        if (positions[devId][0]) {
-          firstPoints[devId] = positions[devId][0];
-        }
+      const response = await fetch(`${apiurl}/MultipleDeviceHistory`, {
+        method: "POST",
+        body: JSON.stringify({ device_id, startdate, enddate }),
+        headers: { "Content-Type": "application/json" },
       });
 
-  console.log(firstPoints,"first point");
-  setLiveMarkers(firstPoints);
-}, [positions, device]);
+      const data = await response.json();
+      if (!data?.data?.length) return setloading(false);
 
+      const grouped = {};
 
-  // ✅ PLAY MULTIPLE DEVICE ANIMATION
-  const playdata = () => {
-    if (pause) {
-      clearInterval(playInterval.current);
-      playInterval.current = null;
-      setpause(false);
-      return;
-    }
+      data.data.forEach((ele) => {
+        const coords = getValidCoordinates(ele.lat, ele.long);
+        if (!coords) return;
 
-    setpause(true);
-    let index = 0;
-    console.log(positions);
-    playInterval.current = setInterval(() => {
-      const updated = {};
-
-      Object.keys(positions).forEach((devId) => {
-        if (positions[devId][index]) {
-          updated[devId] = positions[devId][index];
-        }
+        if (!grouped[ele.device_id]) grouped[ele.device_id] = [];
+        grouped[ele.device_id].push(coords);
       });
 
-      if (Object.keys(updated).length === 0) {
-        clearInterval(playInterval.current);
-        return;
+      console.log(grouped);
+      setPositions(grouped);
+
+      const firstKey = Object.keys(grouped)[0];
+      if (firstKey) {
+        setDefaultCenter(grouped[firstKey][0]);
+        setZoom(12);
       }
 
-      console.log(updated);
-      setLiveMarkers(updated);
-      index++;
-    }, 100 * Time);
-  };
+      setloading(false);
+    },
+    [apiurl, startdate, enddate]
+  );
+
+  useEffect(() => {
+    console.log(positions, "positions", device);
+    // if (!positions?.length || !device?.length) return;
+    const firstPoints = {};
+
+    // positions.forEach((ele) => {
+    //   if (device.includes(ele.device_id) && !firstPoints[ele.device_id]) {
+    //     firstPoints[ele.device_id] = ele.coords.split(",").map(Number);
+    //   }
+    // });
+
+    Object.keys(positions).forEach((devId) => {
+      if (positions[devId][0]) {
+        firstPoints[devId] = positions[devId][0];
+      }
+    });
+
+    console.log(firstPoints, "first point");
+    setLiveMarkers(firstPoints);
+  }, [positions, device]);
+
+  // // ✅ PLAY MULTIPLE DEVICE ANIMATION
+  // const playdata = () => {
+  //   if (pause) {
+  //     clearInterval(playInterval.current);
+  //     playInterval.current = null;
+  //     setpause(false);
+  //     return;
+  //   }
+    
+  //   setPositions([]);
+  //   setpause(true);
+  //   let index = 0;
+  //   console.log(positions,"play position",Object.keys(positions));
+  //   playInterval.current = setInterval(() => {
+  //     const updated = {};
+  //     const group = {};
+ 
+
+  //     Object.keys(positions).forEach((devId) => {
+  //       if (positions[devId][index]) {
+
+
+  //           setPositions((prev) => ({
+  //           ...prev,
+  //           [devId]: [...(prev[devId] || []), positions[devId][index]],
+  //         }));
+
+
+  //         updated[devId] = positions[devId][index];
+          
+     
+
+  //       }
+  //     });
+
+  //     if (Object.keys(updated).length === 0) {
+  //       clearInterval(playInterval.current);
+  //       return;
+  //     }
+
+  //     console.log(updated,Time,group);
+  
+      
+  //     setLiveMarkers(updated);
+  //     index++;
+  //   }, 100 * Time);
+  // };
+
+const playdata = () => {
+  if (pause) {
+    clearInterval(playInterval.current);
+    playInterval.current = null;
+    setpause(false);
+    return;
+  }
+
+  setPositions({}); // reset to empty object instead of array
+  setpause(true);
+  let index = 0;
+
+  playInterval.current = setInterval(() => {
+    const updated = {};
+
+    Object.keys(positions).forEach((devId) => {
+      const point = positions[devId][index];
+      if (point) {
+        console.log(point,"my point");
+        setPositions((prev) => ({
+          ...prev,
+          [devId]: [...(prev[devId] || []), point],
+        }));
+        updated[devId] = point;
+      }
+    });
+
+    if (Object.keys(updated).length === 0) {
+      clearInterval(playInterval.current);
+      playInterval.current = null; // reset reference
+      setpause(false); // optional: auto-unpause when finished
+      return;
+    }
+      
+    // setLiveMarkers(updated);
+    index++;
+  }, 100 * Time);
+};
+
 
   useEffect(() => {
     fetchDevices();
   }, []);
 
-  const [show ,setshow] = useState();
+  const [show, setshow] = useState();
 
   useEffect(() => {
     setTimeout(() => {
@@ -180,7 +252,7 @@ const MapHistory = () => {
     <div className="flex h-screen">
       <Navbar />
 
-    <ToastContainer />
+      <ToastContainer />
 
       <section className="flex-1 overflow-auto">
         <div className="p-6 border-b">
@@ -189,10 +261,8 @@ const MapHistory = () => {
             <span>History of Devices</span>
           </div>
 
-          
-
-                    <div className="flex flex-wrap gap-6 items-end">
-                        {/* <select
+          <div className="flex flex-wrap gap-6 items-end">
+            {/* <select
                             onChange={(e) => setdevice(e.target.value)}
                             className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
@@ -204,67 +274,94 @@ const MapHistory = () => {
                             ))}
                         </select> */}
 
-                        <div
-                            onClick={() => setshow(!show)}
-                            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 relative">
-                            <input type="text" value={device} readOnly placeholder="All Devices" className="outline-white cursor-pointer" />
-                            {show && <ul onClick={(e) => e.stopPropagation()}
-                                className="absolute top-14 z-[9999] bg-white w-[13rem] h-[60vh] overflow-auto rounded">
-                                {/* <li>All Devices</li> */}
+            <div className="flex flex-col gap-1">
+              <label>Device</label>
+              <div
+                onClick={() => setshow(!show)}
+                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 relative"
+              >
+                <input
+                  type="text"
+                  value={device}
+                  readOnly
+                  placeholder="All Devices"
+                  className="outline-white cursor-pointer"
+                />
+                {show && (
+                  <ul
+                    onClick={(e) => e.stopPropagation()}
+                    className="absolute top-14 z-[9999] bg-white w-[13rem] h-[60vh] overflow-auto rounded"
+                  >
+                    {/* <li>All Devices</li> */}
 
-                                {deviceData.map((w) => (
-                                    <li key={w.device_id} value={w.device_id} >
-                                        <label htmlFor={w.device_id} className="flex justify-between items-center px-4 py-1  cursor-pointer">
-                                            <input type="checkbox"
-                                                // onChange={e => setdevice(pre => [...pre, e.target.value])}
-                                                onChange={(e) => {
-                                                    const value = e.target.value;
-                                                    setdevice((prev) =>
-                                                        e.target.checked
-                                                            ? [...prev, value]
-                                                            : prev.filter((id) => id !== value)
-                                                    );
-                                                }}
-                                                value={w.device_id} id={w.device_id}
-                                            />
-                                            {/* <p className="w-[85%]" >{w.device_id}</p> */}
-                                            {w.device_id}
-                                        </label>
-                                    </li>
-                                ))}
+                    {deviceData.map((w) => (
+                      <li key={w.device_id} value={w.device_id}>
+                        <label
+                          htmlFor={w.device_id}
+                          className="flex justify-between items-center px-4 py-1  cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            // onChange={e => setdevice(pre => [...pre, e.target.value])}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setdevice((prev) =>
+                                e.target.checked
+                                  ? [...prev, value]
+                                  : prev.filter((id) => id !== value)
+                              );
+                            }}
+                            value={w.device_id}
+                            id={w.device_id}
+                            checked={device.includes(w.device_id) && true}
+                          />
+                          {/* <p className="w-[85%]" >{w.device_id}</p> */}
+                          {w.device_id}
+                        </label>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
 
-                            </ul>}
-                        </div>
+            <div className="flex flex-col gap-1">
+              <label htmlFor="startdate" className="text-sm text-gray-600">
+                From
+              </label>
+              <input
+                type="date"
+                value={startdate}
+                id="startdate"
+                onChange={(e) => setstartdate(e.target.value)}
+                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="flex flex-col gap-1">
+              <label htmlFor="enddate" className="text-sm text-gray-600">
+                To
+              </label>
+              <input
+                type="date"
+                id="enddate"
+                value={enddate}
+                onChange={(e) => setenddate(e.target.value)}
+                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-                        <div className="flex flex-col gap-1">
-                            <label htmlFor="startdate" className="text-sm text-gray-600">From</label>
-                            <input
-                                type="date"
-                                value={startdate}
-                                id="startdate"
-                                onChange={(e) => setstartdate(e.target.value)}
-                                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-                        <div className="flex flex-col gap-1">
-                            <label htmlFor="enddate" className="text-sm text-gray-600">To</label>
-                            <input
-                                type="date"
-                                id="enddate"
-                                value={enddate}
-                                onChange={(e) => setenddate(e.target.value)}
-                                className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-
-                        <button className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded transition" 
-                        onClick={() => {
-                          console.log(device.length )
-                            if(device.length == 0) notify("Select the device.");
-                            device && historydata(device);
-                            setshow(false);
-                        }}>Filter</button>
-                    </div>
+            <button
+              className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded transition"
+              onClick={() => {
+                console.log(device.length);
+                if (device.length == 0) notify("Select the device.");
+                device && historydata(device);
+                setshow(false);
+              }}
+            >
+              Filter
+            </button>
+          </div>
 
           {/* <div className="flex gap-4">
             <div>
@@ -298,16 +395,14 @@ const MapHistory = () => {
         {!loading ? (
           <div className="p-6 flex gap-4">
             <div className="bg-gray-800 p-4 rounded text-white space-y-4">
-              <button onClick={playdata}>
-                {pause ? <Pause /> : <Play />}
-              </button>
+              <button onClick={playdata}>{pause ? <Pause /> : <Play />}</button>
 
-              <button onClick={() => setTime(5)}>
+              <button onClick={() => setTime(50)}>
                 <FastForward />
               </button>
             </div>
 
-                 {/* {positions.length > 10 && (
+            {/* {positions.length > 10 && (
                             <div className="flex flex-col justify-between items-start gap-4 bg-gray-800 text-white p-4 rounded-2xl shadow-md my-3">
                                 
                                 <div className="flex items-center gap-3">
@@ -350,21 +445,35 @@ const MapHistory = () => {
                         )} */}
 
             <div className="flex-1 rounded-xl overflow-hidden shadow-lg h-[calc(100vh-220px)]">
-              <MapContainer center={defaultCenter} zoom={zoom} style={{ height: "100%", width: "100%" }}>
+              <MapContainer
+                center={defaultCenter}
+                zoom={zoom}
+                style={{ height: "100%", width: "100%" }}
+              >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 
                 <SetViewOnChange center={defaultCenter} zoom={zoom} />
 
-                
                 {positions &&
+                
                   Object.keys(positions).map((devId) => (
-                    <Polyline key={devId} positions={positions[devId]} pathOptions={{ color: "red", weight: 4 }}/>
+                    <>
+                    {console.log(positions[devId],"object")}
+                    <Polyline
+                      key={devId}
+                      positions={positions[devId]}
+                      pathOptions={{ color: "red", weight: 4 }}
+                    />
+                    </>
                   ))}
-
 
                 {liveMarkers &&
                   Object.entries(liveMarkers).map(([devId, pos]) => (
-                    <Marker key={devId} position={pos} icon={directionIcon(customMarkerImage, 0)}>
+                    <Marker
+                      key={devId}
+                      position={pos}
+                      icon={directionIcon(customMarkerImage, 0)}
+                    >
                       <Popup>
                         <p>Device: {devId}</p>
                         <p>Lat: {pos[0]}</p>
@@ -387,16 +496,12 @@ export default MapHistory;
 
 // ✅ Helper: keeps map center and zoom updated
 const SetViewOnChange = ({ center, zoom }) => {
-    const map = useMap();
-    useEffect(() => {
-        if (center && zoom) map.setView(center, zoom);
-    }, [center, zoom, map]);
-    return null;
+  const map = useMap();
+  useEffect(() => {
+    if (center && zoom) map.setView(center, zoom);
+  }, [center, zoom, map]);
+  return null;
 };
-
-
-
-
 
 // import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from "react-leaflet";
 // import L from "leaflet";
@@ -405,7 +510,6 @@ const SetViewOnChange = ({ center, zoom }) => {
 // import { useState, useCallback, useEffect, useRef } from "react";
 // import { ArrowLeft, FastForward, LoaderCircle, MapPinCheck, Pause, Play, RotateCcw } from "lucide-react";
 // import Navbar from "../components/Nav"
-
 
 // delete L.Icon.Default.prototype._getIconUrl;
 // L.Icon.Default.mergeOptions({
@@ -505,7 +609,7 @@ const SetViewOnChange = ({ center, zoom }) => {
 //                     // Create and use a Promise properly
 //                     const promise = new Promise((resolve, reject) => {
 //                         if (coords) {
-                            
+
 //                          if (uniquecoord !== coords) {
 //                             newPositions.push({"device_id":ele.device_id,"coords":coords});
 //                             resolve(coords); // success
@@ -546,7 +650,7 @@ const SetViewOnChange = ({ center, zoom }) => {
 //                         // setMarker1(uniqueArray[0]?.coords.split(","));
 //                     }
 //                 }
-                
+
 //                 setloading(false);
 
 //             }
@@ -554,7 +658,6 @@ const SetViewOnChange = ({ center, zoom }) => {
 //             console.error("Error fetching map info:", error);
 //         }
 //     }, [apiurl, startdate, enddate]);
-
 
 //     //     const historydata = useCallback(async (device_id) => {
 //     //     if (!device_id) return;
@@ -597,8 +700,7 @@ const SetViewOnChange = ({ center, zoom }) => {
 //     //                 const promise = new Promise((resolve, reject) => {
 //     //                     if (coords) {
 //     //                         // newPositions.push(coords);
-                            
-                                                        
+
 //     //                         if (coords) {
 //     //                             // If device_id not exists, create array
 //     //                             if (!newPositions[ele.device_id]) {
@@ -621,7 +723,7 @@ const SetViewOnChange = ({ center, zoom }) => {
 //     //                     }
 //     //                 });
 
-//     //                 // // Handle the Promise 
+//     //                 // // Handle the Promise
 //     //                 promise
 //     //                     .then((result) => {
 //     //                         // console.log("✅ Valid coords:", result);
@@ -644,7 +746,6 @@ const SetViewOnChange = ({ center, zoom }) => {
 //     //             //     // console.log(ele.split(","))
 //     //             // });
 
-
 //     //             // console.log(uniqueArray[0]?.split(","));
 //     //             // if (uniqueArray.length > 0) {
 //     //             //     if (uniqueArray[0]?.split(",")[0] !== "0") {
@@ -659,8 +760,6 @@ const SetViewOnChange = ({ center, zoom }) => {
 //     //         console.error("Error fetching map info:", error);
 //     //     }
 //     // }, [apiurl, startdate, enddate]);
-
-
 
 //     async function fetchDevices() {
 
@@ -683,7 +782,6 @@ const SetViewOnChange = ({ center, zoom }) => {
 //     //     device && historydata(device);
 //     // }, [device, startdate, enddate]);
 
-
 //     // console.log("coords", device, defaultCenter, zoom,positions);
 
 //     useEffect(() => {
@@ -692,7 +790,6 @@ const SetViewOnChange = ({ center, zoom }) => {
 //         }, 300);
 //         fetchDevices();
 //     }, []);
-
 
 //     const [pause, setpause] = useState(false);
 //     const playInterval = useRef(null);
@@ -767,7 +864,7 @@ const SetViewOnChange = ({ center, zoom }) => {
 //                             {deviceData.map((device) => (
 //                                 <option key={device.device_id} value={device.device_id}>
 //                                     {device.device_id}
-//                                 </option> 
+//                                 </option>
 //                             ))}
 //                         </select> */}
 
@@ -824,7 +921,7 @@ const SetViewOnChange = ({ center, zoom }) => {
 //                             />
 //                         </div>
 
-//                         <button className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded transition" 
+//                         <button className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded transition"
 //                         onClick={() => {
 //                             if(device.length < 0) alert("Select the device.");
 //                             device && historydata(device);
@@ -921,7 +1018,6 @@ const SetViewOnChange = ({ center, zoom }) => {
 // };
 
 // export default MapHistory;
-
 
 // // ✅ Helper: keeps map center and zoom updated
 // const SetViewOnChange = ({ center, zoom }) => {
