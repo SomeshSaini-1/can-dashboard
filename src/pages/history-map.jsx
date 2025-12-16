@@ -29,6 +29,28 @@ L.Icon.Default.mergeOptions({
   shadowUrl: null,
 });
 
+
+function getBearing(lat1, lon1, lat2, lon2) {
+    const toR = deg => deg * Math.PI / 180;
+    const toD = rad => rad * 180 / Math.PI;
+    
+    [lat1, lon1, lat2, lon2] = [toR(lat1), toR(lon1), toR(lat2), toR(lon2)];
+    
+    const dLon = lon2 - lon1;
+    const y = Math.sin(dLon) * Math.cos(lat2);
+    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
+    
+    let bearing = toD(Math.atan2(y, x));
+    return (bearing + 360) % 360; // Normalize to 0-360
+}
+
+// // Usage Example: (Requires two distinct points)
+// const startLat = 26.79643411;
+// const startLon = 75.8904926;
+// const endLat = 26.80; // A second, different latitude point
+// const endLon = 75.90; // A second, different longitude point
+
+
 const directionIcon = (img, angle = 0) =>
   L.divIcon({
     html: `<img src="${img}" style="transform: rotate(${angle}deg); width: 60px; height: 40px;" />`,
@@ -44,9 +66,7 @@ const MapHistory = () => {
   // const [zoom, setZoom] = useState(6);
 
   const notify = (data) => toast(data);
-  const [defaultCenter, setDefaultCenter] = useState([
-    28.624632933245827, 77.20809144517892,
-  ]);
+  const [defaultCenter, setDefaultCenter] = useState([28.624632933245827, 77.20809144517892]);
   const [zoom, setZoom] = useState(5);
   const [positions, setPositions] = useState({});
   const [liveMarkers, setLiveMarkers] = useState({});
@@ -56,6 +76,7 @@ const MapHistory = () => {
   const [pause, setpause] = useState(false);
   const playInterval = useRef(null);
   const [Time, setTime] = useState(10);
+  const [direction1,setdirection1] = useState({});
 
   const formatDate = (d = new Date()) => {
     const y = d.getFullYear();
@@ -88,8 +109,10 @@ const MapHistory = () => {
     }
   }
 
-  const historydata = useCallback(
-    async (device_id) => {
+  const historydata = useCallback( async (device_id) => {
+
+    try {
+        
       if (!device_id?.length) return;
 
       setloading(true);
@@ -105,9 +128,9 @@ const MapHistory = () => {
 
       const grouped = {};
 
-      data.data.forEach((ele) => {
+      data.data.reverse().forEach((ele) => {
         const coords = getValidCoordinates(ele.lat, ele.long);
-        if (!coords) return;
+        if (!coords) return;  
 
         if (!grouped[ele.device_id]) grouped[ele.device_id] = [];
         grouped[ele.device_id].push(coords);
@@ -123,14 +146,33 @@ const MapHistory = () => {
       }
 
       setloading(false);
+
+      
+    const firstPoints = {};
+    Object.keys(grouped).forEach((devId) => {
+      if (grouped[devId][0]) {
+        firstPoints[devId] = grouped[devId][0];
+      }
+    });
+
+    console.log(firstPoints, "first point");
+    setLiveMarkers(firstPoints);
+
+
+    } catch (error) {
+      console.error("historydata error : ",error);
+    }
+
+
     },
     [apiurl, startdate, enddate]
   );
 
   useEffect(() => {
-    console.log(positions, "positions", device);
+
+    console.log(positions , "positions", device);
     // if (!positions?.length || !device?.length) return;
-    const firstPoints = {};
+  
 
     // positions.forEach((ele) => {
     //   if (device.includes(ele.device_id) && !firstPoints[ele.device_id]) {
@@ -138,15 +180,84 @@ const MapHistory = () => {
     //   }
     // });
 
+    const firstPoints = {};
     Object.keys(positions).forEach((devId) => {
-      if (positions[devId][0]) {
-        firstPoints[devId] = positions[devId][0];
+
+      // if (positions[devId].length  <= 4) {
+      //   const startLat = positions[devId][positions[devId].length  ];   
+      //   const endLat = positions[devId][positions[devId].length - 1 ];     
+          
+    if (positions[devId] && positions[devId].length >= 2) {
+      
+        const endLat = positions[devId][positions[devId].length - 1]; 
+        const startLat = positions[devId][positions[devId].length - 2]; 
+        console.log(endLat,startLat);
+
+        firstPoints[devId] = getBearing(startLat[0], startLat[1], endLat[0], endLat[1]); 
+
+
+        // console.log(`Direction (Bearing): ${direction.toFixed(2)} degrees`);
+        // setdirection1(direction.toFixed(2));
       }
     });
 
-    console.log(firstPoints, "first point");
-    setLiveMarkers(firstPoints);
+    console.log(firstPoints);
+    setdirection1(firstPoints);
   }, [positions, device]);
+
+
+    // const firstPoints = {};
+    // Object.keys(positions).forEach((devId) => {
+    //   if (positions[devId][0]) {
+    //     firstPoints[devId] = positions[devId][0];
+    //   }
+    // });
+
+    // console.log(firstPoints, "first point");
+    // setLiveMarkers(firstPoints);
+
+
+  const playdata = () => {
+    if (pause) {
+      clearInterval(playInterval.current);
+      playInterval.current = null;
+      setpause(false);
+      return;
+    }
+
+    setPositions({}); // reset to empty object instead of array
+    setpause(true);
+    let index = 0;
+
+    playInterval.current = setInterval(() => {
+      const updated = {};
+
+      Object.keys(positions).forEach((devId) => {
+        const point = positions[devId][index];
+        if (point) {
+          // console.log(point,"my point");
+          setPositions((prev) => ({
+            ...prev,
+            [devId]: [...(prev[devId] || []), point],
+          }));
+          updated[devId] = point;
+        }
+      });
+
+      if (Object.keys(updated).length === 0) {
+        clearInterval(playInterval.current);
+        playInterval.current = null; // reset reference
+        setpause(false); // optional: auto-unpause when finished
+        return;
+      }
+        
+      setLiveMarkers(updated);
+      console.log(updated,'live marker');
+      index++;
+    }, 100 * Time);
+
+  };
+
 
   // // ✅ PLAY MULTIPLE DEVICE ANIMATION
   // const playdata = () => {
@@ -195,46 +306,6 @@ const MapHistory = () => {
   //     index++;
   //   }, 100 * Time);
   // };
-
-const playdata = () => {
-  if (pause) {
-    clearInterval(playInterval.current);
-    playInterval.current = null;
-    setpause(false);
-    return;
-  }
-
-  setPositions({}); // reset to empty object instead of array
-  setpause(true);
-  let index = 0;
-
-  playInterval.current = setInterval(() => {
-    const updated = {};
-
-    Object.keys(positions).forEach((devId) => {
-      const point = positions[devId][index];
-      if (point) {
-        console.log(point,"my point");
-        setPositions((prev) => ({
-          ...prev,
-          [devId]: [...(prev[devId] || []), point],
-        }));
-        updated[devId] = point;
-      }
-    });
-
-    if (Object.keys(updated).length === 0) {
-      clearInterval(playInterval.current);
-      playInterval.current = null; // reset reference
-      setpause(false); // optional: auto-unpause when finished
-      return;
-    }
-      
-    // setLiveMarkers(updated);
-    index++;
-  }, 100 * Time);
-};
-
 
   useEffect(() => {
     fetchDevices();
@@ -457,14 +528,14 @@ const playdata = () => {
                 {positions &&
                 
                   Object.keys(positions).map((devId) => (
-                    <>
-                    {console.log(positions[devId],"object")}
+                    // <>
+                    // {console.log(positions[devId],"object")}
                     <Polyline
                       key={devId}
                       positions={positions[devId]}
                       pathOptions={{ color: "red", weight: 4 }}
                     />
-                    </>
+                    // </>
                   ))}
 
                 {liveMarkers &&
@@ -472,7 +543,7 @@ const playdata = () => {
                     <Marker
                       key={devId}
                       position={pos}
-                      icon={directionIcon(customMarkerImage, 0)}
+                      icon={directionIcon(customMarkerImage, direction1[devId] || 0 )}
                     >
                       <Popup>
                         <p>Device: {devId}</p>
@@ -485,7 +556,7 @@ const playdata = () => {
             </div>
           </div>
         ) : (
-          <LoaderCircle className="animate-spin" />
+          <LoaderCircle className="animate-spin absolute top-1/2 left-1/2" />
         )}
       </section>
     </div>
@@ -502,6 +573,29 @@ const SetViewOnChange = ({ center, zoom }) => {
   }, [center, zoom, map]);
   return null;
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from "react-leaflet";
 // import L from "leaflet";
