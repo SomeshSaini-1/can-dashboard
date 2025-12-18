@@ -230,7 +230,7 @@ const MapHistory = () => {
         // Set initial live markers to last known position + initial bearing
         const lastPoints = {};
         const initialBearings = {};
-
+        
         setLiveMarkers(lastPoints);
         setDirection1(initialBearings);
       } catch (error) {
@@ -317,6 +317,8 @@ const MapHistory = () => {
     }, 300);
   }, []);
 
+  // console.log(Object.values(positions).length ,"sdsdf")
+
   return (
     <div className="flex h-screen bg-[#050B14] text-white">
       <ToastContainer />
@@ -338,17 +340,17 @@ const MapHistory = () => {
               Home <Home size={18} />
             </button> */}
 
-            <button
+            {/* <button
               onClick={() => setShowPanel(!showPanel)}
               className="flex gap-1 items-center border-2 rounded px-4 py-2 hover:bg-white/10"
             >
               {showPanel ? "Hide" : "Show"} Panel <PlayCircle size={18} />
-            </button>
+            </button> */}
           </div>
         </header>
 
         <div className="flex gap-4 h-[calc(100vh-120px)]">
-          {!showPanel && (
+          {showPanel && (
             <aside className="w-[320px] bg-[#0D1624] rounded-xl p-4 space-y-4 overflow-y-auto">
               <div>
                 <label className="flex justify-between items-center mb-2">
@@ -402,14 +404,22 @@ const MapHistory = () => {
                 />
               </div>
 
-              <button
+              <div className="flex gap-2">
+                <button
                 onClick={() => historydata(device)}
                 className="w-full bg-blue-600 rounded p-2 hover:bg-blue-700"
               >
-                Load History
+                Submit
               </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full bg-blue-600 rounded p-2 hover:bg-blue-700"
+              >
+                Refresh
+              </button>
+              </div>
 
-              <div className="flex gap-2 items-center">
+              {Object.values(positions).length != 0  && <div className="flex gap-2 items-center">
                 <button
                   onClick={playdata}
                   className="bg-green-600 p-3 rounded hover:bg-green-700"
@@ -427,7 +437,7 @@ const MapHistory = () => {
                   <option value={20}>Medium</option>
                   <option value={40}>Slow</option>
                 </select>
-              </div>
+              </div>}
             </aside>
           )}
 
