@@ -383,7 +383,7 @@ export default function Adddevice() {
   const [page, setPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [limit, setlimit] = useState(20);
+  const [limit, setlimit] = useState(40);
   const [collapsed, setCollapsed] = useState(false);
 
   const [geofenceCount, setGeofenceCount] = useState(0); // NEW STATE

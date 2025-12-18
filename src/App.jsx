@@ -14,6 +14,7 @@ import Alert_page from './pages/Alert';
 import History from "./pages/history";
 import Geofencing from "./pages/addgeofencing";
 import MapHistory from "./pages/history-map"
+import VehicleHistory from "./pages/vhicle_history"
 
 // Route protection component
 function ProtectedRoute() {
@@ -24,13 +25,13 @@ function ProtectedRoute() {
 function App() {
   const router = createBrowserRouter([
     {
-      // element: <ProtectedRoute />, // Protect all children routes
-      // children: [
-      //   {
+      element: <ProtectedRoute />, // Protect all children routes
+      children: [
+        {
           path: '/Home',
           element: <Home />,
-      //   },
-      // ],
+        },
+      ],
     },
     {
       // element: <ProtectedRoute />,
@@ -49,10 +50,14 @@ function App() {
       path:"/AddDevice",
       element : <Adddevice />
     },
-      {
-        path : "/History",
-        element : <History />
-      },
+    {
+      path : "/History",
+      element : <History />
+    },
+    {
+      path : "/VhicalTraking",
+      element : <VehicleHistory />
+    },
     {
       path :"/User",
       element : <User />

@@ -134,6 +134,7 @@ const Map = ({ height = 100, device, data_seletected }) => {
               key={`${deviceId}-${idx}`}
               position={pos}
               icon={directionIcon(customMarkerImage, 20)}
+               
             >
               <Popup>
                 <div>
